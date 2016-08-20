@@ -2,7 +2,7 @@ var levels = [];
 
 function loadLevel(name) {
   var request = new XMLHttpRequest();
-  request.open('POST', 'http://localhost:3000/level', true);
+  request.open('POST', 'http://localhost:3000/load', true);
   request.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
   request.onload = function(e) {
     console.log('level loaded', JSON.parse(e.target.response));

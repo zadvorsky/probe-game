@@ -1,5 +1,6 @@
 // SETTINGS
 
+const PORT = 3000;
 const LEVELS_DIR = '/levels/';
 
 // DEPENDENCIES
@@ -44,6 +45,6 @@ app.post('/save', function(req, res) {
 
 // RUN
 
-app.listen(3000, function() {
-  console.log('level editor running on port 3000');
+app.listen(PORT, function() {
+  console.log('level editor running on port ' + PORT);
 });

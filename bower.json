@@ -1,0 +1,22 @@
+{
+  "name": "probe",
+  "description": "It's a game!",
+  "main": "index.js",
+  "authors": [
+    "Szenia Zadvornykh"
+  ],
+  "license": "ISC",
+  "homepage": "https://github.com/zadvorsky/probe-game",
+  "moduleType": [],
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "three.js": "threejs#*"
+  }
+}

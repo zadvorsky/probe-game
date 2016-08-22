@@ -1,3 +1,11 @@
+//=require ../../engine/engine.js
+
+console.log('this is editor main.js');
+
+
+var engine = new Engine();
+
+
 var levels = [];
 
 function loadLevel(name) {

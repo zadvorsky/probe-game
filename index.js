@@ -1,7 +1,7 @@
 // SETTINGS
 
 const PORT = 3000;
-const LEVELS_DIR = '/levels/';
+const LEVELS_DIR = __dirname + '/levels/';
 
 // DEPENDENCIES
 
@@ -16,26 +16,26 @@ var path = require('path');
 var app = express();
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: true}));
-app.use(express.static('public'));
+app.use(express.static('bin'));
 
 // ROUTES
 
 app.post('/levels', function(req, res) {
-  fs.readdir(path.join(__dirname + LEVELS_DIR), function(error, files) {
+  fs.readdir(path.join(LEVELS_DIR), function(error, files) {
     if (error) console.log('/levels error', error);
     else res.send(files);
   })
 });
 
 app.post('/load', function(req, res) {
-  res.sendFile(path.join(__dirname + LEVELS_DIR + req.body.name));
+  res.sendFile(path.join(LEVELS_DIR + req.body.name));
 });
 
 app.post('/save', function(req, res) {
   var data = req.body;
   var levelName = data.level_name;
   var levelData = data.level_data;
-  var fileName = path.join(__dirname + LEVELS_DIR + levelName + '.json');
+  var fileName = path.join(LEVELS_DIR + levelName + '.json');
   
   jsonfile.writeFile(fileName, levelData, function(error) {
     if (error) console.log('/save error', error);

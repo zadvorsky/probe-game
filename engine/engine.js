@@ -3,6 +3,7 @@
 
 //=require init.js
 //=require utils.js
+//=require config.js
 //=require objects/GameObject.js
 //=require objects/*.js
 //=require controllers/*.js
@@ -34,9 +35,9 @@ GAME.Engine = function(container) {
   // objects
   this.initProbe();
 
-  this.add(new THREE.AxisHelper(10));
-
   // tick/update/render
+  this.paused = false;
+
   this.tick = this.tick.bind(this);
   this.tick();
 };
@@ -60,12 +61,19 @@ GAME.Engine.prototype.initProbe = function() {
   this.inputController = new GAME.InputController(this.probe);
 };
 
+GAME.Engine.prototype.reset = function() {
+  this.probe.reset();
+};
+
 GAME.Engine.prototype.resize = function() {
   var width = window.innerWidth;
   var height = window.innerHeight;
 
-  this.activeCamera.aspect = width / height;
-  this.activeCamera.updateProjectionMatrix();
+  for (var key in this.cameras) {
+    var camera = this.cameras[key];
+    camera.aspect = width / height;
+    camera.updateProjectionMatrix();
+  }
 
   this.renderer.setSize(width, height);
 };
@@ -82,6 +90,8 @@ GAME.Engine.prototype.tick = function() {
 // - play
 
 GAME.Engine.prototype.update = function() {
+  if (this.paused === true) return;
+
   this.world.step(1/60);
   this.inputController.update();
 

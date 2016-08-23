@@ -18,6 +18,7 @@
   ],
   "dependencies": {
     "three.js": "threejs#*",
-    "p2js": "^0.7.1"
+    "p2js": "^0.7.1",
+    "vue": "^1.0.26"
   }
 }

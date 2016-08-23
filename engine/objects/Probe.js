@@ -43,3 +43,8 @@ GAME.Probe.prototype.setCamera = function(camera) {
   this.camera.position.z = 20;
   this.add(camera);
 };
+
+GAME.Probe.prototype.reset = function(camera) {
+  this.body.velocity[0] = this.body.position[0] = 0;
+  this.body.velocity[1] = this.body.position[1] = 0;
+};

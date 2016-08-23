@@ -37,3 +37,9 @@ GAME.Probe.prototype.setThrusterDirection = function(t) {
   this.thrusterDirection[0] = t[0];
   this.thrusterDirection[1] = t[1];
 };
+
+GAME.Probe.prototype.setCamera = function(camera) {
+  this.camera = camera;
+  this.camera.position.z = 20;
+  this.add(camera);
+};

@@ -1,42 +1,116 @@
 //=require ../bower_components/three.js/build/three.js
-//=require ../bower_components/three.js/examples/js/controls/OrbitControls.js
 //=require ../bower_components/p2js/build/p2.js
 
 //=require init.js
 //=require utils.js
-//=require three.root.js
 //=require objects/GameObject.js
 //=require objects/*.js
 //=require controllers/*.js
 
-GAME.Engine = function() {
-  var root = new GAME.Root();
+GAME.Engine = function(container) {
+  // renderer
+  this.container = container;
+  this.initRenderer();
 
-  root.camera.position.z = 20;
-  root.add(new THREE.AxisHelper(10));
+  // scene
+  this.scene = new THREE.Scene();
 
-  var world = new p2.World({
+  // camera
+  this.cameras = {};
+  this.registerCamera('probe', new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.1, 10000));
+  this.activateCamera('probe');
+
+  // resize
+  this.resize = this.resize.bind(this);
+  this.resize();
+  window.addEventListener('resize', this.resize, false);
+
+  // physics
+  this.world = new p2.World({
     gravity: [0, 0]
   });
+  // todo init global materials, groups
 
-  var probe = new GAME.Probe();
+  // objects
+  this.initProbe();
 
-  root.add(probe, 'probe');
-  world.addBody(probe.body);
+  this.add(new THREE.AxisHelper(10));
 
-  var inputController = new GAME.InputController(probe);
+  // tick/update/render
+  this.tick = this.tick.bind(this);
+  this.tick();
+};
 
-  root.addUpdateCallback(function() {
-    inputController.update();
-    world.step(1/60);
+GAME.Engine.prototype.initRenderer = function() {
+  var pixelRatio = window.devicePixelRatio;
+  var antialias = (pixelRatio === 1);
+
+  this.renderer = new THREE.WebGLRenderer({antialias: antialias});
+  this.renderer.setPixelRatio(pixelRatio);
+
+  this.container.appendChild(this.renderer.domElement);
+};
+
+GAME.Engine.prototype.initProbe = function() {
+  this.probe = new GAME.Probe();
+  this.add(this.probe);
+
+  this.probe.setCamera(this.cameras['probe']);
+
+  this.inputController = new GAME.InputController(this.probe);
+};
+
+GAME.Engine.prototype.resize = function() {
+  var width = window.innerWidth;
+  var height = window.innerHeight;
+
+  this.activeCamera.aspect = width / height;
+  this.activeCamera.updateProjectionMatrix();
+
+  this.renderer.setSize(width, height);
+};
+
+GAME.Engine.prototype.tick = function() {
+  this.update();
+  this.render();
+
+  requestAnimationFrame(this.tick);
+};
+
+// todo add states?
+// - paused/idle (editor default?)
+// - play
+
+GAME.Engine.prototype.update = function() {
+  this.world.step(1/60);
+  this.inputController.update();
+
+  this.scene.traverse(function(child) {
+    child.update && child.update();
   });
 };
-GAME.Engine.prototype.loadLevel = function(file, onComplete) {
-  // clear
-  // parse json
-  // (load models)
-  // callback
-};
-GAME.Engine.prototype.createAsteroid = function(def) {
 
+GAME.Engine.prototype.render = function() {
+  this.renderer.render(this.scene, this.activeCamera);
 };
+
+GAME.Engine.prototype.registerCamera = function(key, camera) {
+  this.cameras[key] = camera;
+};
+GAME.Engine.prototype.activateCamera = function(key) {
+  this.activeCamera = this.cameras[key];
+};
+
+GAME.Engine.prototype.add = function(object) {
+  this.scene.add(object);
+  object.body && this.world.addBody(object.body);
+};
+GAME.Engine.prototype.remove = function(object) {
+  this.scene.remove(object);
+  object.body && this.world.removeBody(object.body);
+};
+
+
+
+GAME.Engine.prototype.loadLevel = function(file, onComplete) {};
+GAME.Engine.prototype.createAsteroid = function(def) {};

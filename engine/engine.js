@@ -18,8 +18,8 @@ GAME.Engine = function(container) {
 
   // camera
   this.cameras = {};
-  this.registerCamera('probe', new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.1, 10000));
-  this.activateCamera('probe');
+  this.registerCamera('game', new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.1, 10000));
+  this.activateCamera('game');
 
   // resize
   this.resize = this.resize.bind(this);
@@ -56,7 +56,7 @@ GAME.Engine.prototype.initProbe = function() {
   this.probe = new GAME.Probe();
   this.add(this.probe);
 
-  this.probe.setCamera(this.cameras['probe']);
+  this.probe.setCamera(this.cameras['game']);
 
   this.inputController = new GAME.InputController(this.probe);
 };

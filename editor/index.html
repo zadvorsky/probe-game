@@ -3,29 +3,55 @@
 <head>
   <meta charset="UTF-8">
   <title>PROBE EDITOR</title>
-
   <style>
     body {
       margin: 0;
       background: white;
       overflow: hidden;
+      font-family: monospace;
     }
+
+    #ui-container {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 100%;
+    }
+
+    .tools {
+      position: absolute;
+      width: 200px;
+      right: 0;
+      background: white;
+    }
+
+    .tool-btn {
+      display: block;
+      padding: 4px;
+      cursor: pointer;
+    }
+    .tool-btn:hover {
+      background: gray;
+    }
+
   </style>
 </head>
 <body>
 
 <div id="app">
-
-  <!--<div>{{ message }}</div>-->
-
   <div id="three-container"></div>
-
-
+  <div id="ui-container">
+    <div class="tools">
+      <span class="tool-btn">global</span>
+      <span class="tool-btn">camera</span>
+      <span class="tool-btn">select</span>
+      <span class="tool-btn">move</span>
+      <span class="tool-btn">rotate</span>
+      <span class="tool-btn">scale</span>
+      <span class="tool-btn">add asteroid</span>
+    </div>
+  </div>
 </div>
-
-
-
-
 <script src="js/main.js"></script>
 </body>
 </html>

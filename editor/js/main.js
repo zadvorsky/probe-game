@@ -3,7 +3,7 @@
 console.log('this is editor main.js');
 
 
-var engine = new Engine();
+var engine = new GAME.Engine();
 
 
 var levels = [];

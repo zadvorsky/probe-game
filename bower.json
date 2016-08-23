@@ -17,6 +17,7 @@
     "tests"
   ],
   "dependencies": {
-    "three.js": "threejs#*"
+    "three.js": "threejs#*",
+    "p2js": "^0.7.1"
   }
 }

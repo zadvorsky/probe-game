@@ -2,6 +2,7 @@ var gulp = require('gulp');
 var include = require('gulp-include');
 var runSequence = require('run-sequence');
 var del = require('del');
+var watch = require('gulp-watch');
 var spawn = require('child_process').spawn;
 
 //////////////////////////////
@@ -18,7 +19,7 @@ gulp.task('build-clean', function(callback) {
 
 var node;
 
-gulp.task('server', function() {
+gulp.task('start-server', function() {
   if (node) node.kill();
   node = spawn('node', ['index.js'], {stdio: 'inherit'});
   node.on('close', function(code) {
@@ -26,10 +27,10 @@ gulp.task('server', function() {
   });
 });
 
-gulp.task('default', function() {
-  gulp.start('server');
-  gulp.watch(['./index.js'], function() {
-    gulp.start('server');
+gulp.task('watch-server', function() {
+  gulp.start('start-server');
+  watch(['./index.js'], function() {
+    gulp.start('start-server');
   });
 });
 
@@ -52,23 +53,53 @@ gulp.task('build-engine', function() {
 // EDITOR
 //////////////////////////////
 
+var editorSources = [
+  './editor/**/*.js' ,
+  './engine/**/*.js'
+];
+
+var editorAssets = [
+  './editor/**/*.html',
+  './assets/**/*.*'
+];
+
 gulp.task('build-editor-js', function() {
-  return gulp.src(['./editor/**/*.js'])
+  return gulp.src(editorSources)
     .pipe(include())
     .on('error', console.log)
     .pipe(gulp.dest('./bin/editor'));
 });
 
+gulp.task('watch-editor-js', function() {
+  watch(editorSources, function() {
+    gulp.start('build-editor-js');
+  });
+});
+
 gulp.task('build-editor-assets', function() {
-  return gulp.src(['./editor/**/*.html', './assets/**/*.*'], {base: './'})
+  return gulp.src(editorAssets, {base: './'})
     .pipe(gulp.dest('./bin'));
+});
+
+gulp.task('watch-editor-assets', function() {
+  watch(editorAssets, function() {
+    gulp.start('build-editor-assets');
+  });
 });
 
 gulp.task('build-editor', function() {
   runSequence(
     'build-clean',
-    //'build-engine',
     'build-editor-assets',
     'build-editor-js'
-  )
+  );
+});
+
+gulp.task('editor', function() {
+  runSequence(
+    'build-editor',
+    'watch-server',
+    'watch-editor-js',
+    'watch-editor-assets'
+  );
 });

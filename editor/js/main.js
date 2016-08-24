@@ -2,17 +2,15 @@
 
 //=require ../../bower_components/three.js/examples/js/controls/OrbitControls.js
 //=require ../../bower_components/vue/dist/vue.js
+//=require ../../bower_components/vue-router/dist/vue-router.js
 
 //=require init.js
 //=require tools/*.js
 
 (function() {
-  //var vue = new Vue({
-  //  el: '#app',
-  //  data: {
-  //    message: 'Hello Vue.js!'
-  //  }
-  //});
+  ////////////////////////////
+  // global/engine objects
+  ////////////////////////////
 
   var engineContainer = document.querySelector('#three-container');
   var uiContainer = document.querySelector('#ui-container');
@@ -20,55 +18,113 @@
   var engine = new GAME.Engine(engineContainer);
   engine.paused = true;
 
-  var gridSize = 100;
-  var gridSegments = 400;
-  var gridStep = gridSize * 2 / gridSegments;
-
-  var editorZPlane = new THREE.Mesh(
-    new THREE.PlaneBufferGeometry(gridSize * 2, gridSize * 2),
-    new THREE.MeshBasicMaterial({
-      visible: false
-    })
-  );
-  editorZPlane.rotation.x = Math.PI * -0.5;
-  engine.add(editorZPlane);
-
-  var grid = new THREE.GridHelper(gridSize, gridSegments, 0x444444, 0x444444);
-  editorZPlane.add(grid);
-
-
-
   var camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.1, 100000);
   camera.position.z = 20;
   var controls = new THREE.OrbitControls(camera);
   controls.keys = false;
+  controls.enableRotate = false;
   engine.registerCamera('editor', camera);
   engine.activateCamera('editor');
 
+  ////////////////////////////
+  // vue.js setup
+  ////////////////////////////
 
+  Vue.use(VueRouter);
 
-  // todo key to command map
-  window.addEventListener('keyup', function(e) {
-    // p
-    if (e.keyCode === 80) {
-      engine.paused = !engine.paused;
-
-      if (engine.paused) {
-        uiContainer.style.display = 'block';
-        editorZPlane.visible = true;
-        engine.activateCamera('editor');
+  var App = Vue.extend({
+    data: function() {
+      return {
+        engine: engine,
+        camera: camera,
+        controls: controls
       }
-      else {
-        uiContainer.style.display = 'none';
-        editorZPlane.visible = false;
-        engine.activateCamera('game');
-      }
-    }
-    // r
-    if (e.keyCode === 82) {
-      engine.reset();
     }
   });
+  var Global = Vue.extend({template: '<div>global</div>'});
+  var Asteroid = Vue.extend({template: '<div>asteroid</div>'});
+
+  var router = new VueRouter();
+
+  router.map({
+    '/global': {
+      component: Global
+    },
+    '/camera': {
+      component: EDITOR.CameraTool
+    },
+    '/asteroid': {
+      component: Asteroid
+    }
+  });
+
+  //router.beforeEach(function(t) {
+  //  console.log('before each', t);
+  //});
+
+  router.start(App, '#app');
+
+
+
+
+
+
+
+  //var engineContainer = document.querySelector('#three-container');
+  //var uiContainer = document.querySelector('#ui-container');
+  //
+  //var engine = new GAME.Engine(engineContainer);
+  //engine.paused = true;
+  //
+  //var gridSize = 100;
+  //var gridSegments = 400;
+  //var gridStep = gridSize * 2 / gridSegments;
+  //
+  //var editorZPlane = new THREE.Mesh(
+  //  new THREE.PlaneBufferGeometry(gridSize * 2, gridSize * 2),
+  //  new THREE.MeshBasicMaterial({
+  //    visible: false
+  //  })
+  //);
+  //editorZPlane.rotation.x = Math.PI * -0.5;
+  //engine.add(editorZPlane);
+  //
+  //var grid = new THREE.GridHelper(gridSize, gridSegments, 0x444444, 0x444444);
+  //editorZPlane.add(grid);
+  //
+  //
+  //
+  //var camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.1, 100000);
+  //camera.position.z = 20;
+  //var controls = new THREE.OrbitControls(camera);
+  //controls.keys = false;
+  //engine.registerCamera('editor', camera);
+  //engine.activateCamera('editor');
+  //
+  //
+  //
+  //// todo key to command map
+  //window.addEventListener('keyup', function(e) {
+  //  // p
+  //  if (e.keyCode === 80) {
+  //    engine.paused = !engine.paused;
+  //
+  //    if (engine.paused) {
+  //      uiContainer.style.display = 'block';
+  //      editorZPlane.visible = true;
+  //      engine.activateCamera('editor');
+  //    }
+  //    else {
+  //      uiContainer.style.display = 'none';
+  //      editorZPlane.visible = false;
+  //      engine.activateCamera('game');
+  //    }
+  //  }
+  //  // r
+  //  if (e.keyCode === 82) {
+  //    engine.reset();
+  //  }
+  //});
 
 
 

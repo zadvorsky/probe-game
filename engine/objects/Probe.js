@@ -3,7 +3,7 @@ GAME.Probe = function() {
   // THREE
 
   var geometry = new THREE.SphereGeometry(1.0, 16, 16);
-  var material = new THREE.MeshBasicMaterial({color: 0xffffff});
+  var material = new THREE.MeshBasicMaterial({color: 0xffffff, wireframe: true});
 
   // PHYSICS
 

@@ -6,9 +6,12 @@
   <style>
     body {
       margin: 0;
-      background: white;
+      background: black;
       overflow: hidden;
       font-family: monospace;
+    }
+    a:visited, a:active {
+      color: black;
     }
 
     #ui-container {
@@ -20,35 +23,38 @@
 
     .tools {
       position: absolute;
-      width: 200px;
+      width: 300px;
       right: 0;
       background: white;
     }
 
     .tool-btn {
       display: block;
-      padding: 4px;
-      cursor: pointer;
+      padding: 8px;
+      text-decoration: none;
     }
     .tool-btn:hover {
       background: gray;
     }
 
+    .tool {
+      border-top: 1px solid black;
+      padding: 8px;
+    }
+
   </style>
 </head>
 <body>
-
 <div id="app">
   <div id="three-container"></div>
   <div id="ui-container">
     <div class="tools">
-      <span class="tool-btn">global</span>
-      <span class="tool-btn">camera</span>
-      <span class="tool-btn">select</span>
-      <span class="tool-btn">move</span>
-      <span class="tool-btn">rotate</span>
-      <span class="tool-btn">scale</span>
-      <span class="tool-btn">add asteroid</span>
+      <a class="tool-btn" v-link="'global'">global</a>
+      <a class="tool-btn" v-link="'camera'">free camera</a>
+      <a class="tool-btn" v-link="'asteroid'">asteroid</a>
+      <div class="tool">
+        <router-view></router-view>
+      </div>
     </div>
   </div>
 </div>

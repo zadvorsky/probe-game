@@ -108,7 +108,7 @@ EDITOR.AsteroidTool = Vue.extend({
 
         var g = shape.extrude(extrudeSettings);
 
-        var mod = new THREE.SubdivisionModifier(1);
+        var mod = new THREE.SubdivisionModifier(2);
         mod.modify(g);
         var edgeCount = 0;
 
@@ -171,9 +171,11 @@ EDITOR.AsteroidTool = Vue.extend({
         //}
 
 
-        var m = new THREE.MeshBasicMaterial({
-          color: 0xff00ff,
-          wireframe: true
+        var m = new THREE.MeshStandardMaterial({
+          color: 0x666666,
+          //shading: THREE.FlatShading,
+          roughness: 1.0,
+          mestalness: 0.0
         });
         var asteroid = new THREE.Mesh(g, m);
         engine.add(asteroid);

@@ -1,6 +1,9 @@
 //=require ../../engine/engine.js
 
 //=require ../../bower_components/three.js/examples/js/controls/OrbitControls.js
+//=require ../../bower_components/three.js/examples/js/geometries/ConvexGeometry.js
+//=require ../../bower_components/three.js/examples/js/modifiers/TessellateModifier.js
+//=require ../../bower_components/three.js/examples/js/modifiers/SubdivisionModifier.js
 //=require ../../bower_components/vue/dist/vue.js
 //=require ../../bower_components/vue-router/dist/vue-router.js
 
@@ -12,12 +15,15 @@
   // global/engine objects
   ////////////////////////////
 
+  // containers
   var engineContainer = document.querySelector('#three-container');
   var uiContainer = document.querySelector('#ui-container');
 
+  // engine
   var engine = new GAME.Engine(engineContainer);
   engine.paused = true;
 
+  // camera & camera controls
   var camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.1, 100000);
   camera.position.z = 20;
   var controls = new THREE.OrbitControls(camera);
@@ -25,6 +31,25 @@
   controls.enableRotate = false;
   engine.registerCamera('editor', camera);
   engine.activateCamera('editor');
+
+  // grid / editing pane
+  var gridSize = 100;
+  var gridSegments = 400;
+  var gridStep = gridSize * 2 / gridSegments;
+
+  var editorZPlane = new THREE.Mesh(
+    new THREE.PlaneBufferGeometry(gridSize * 2, gridSize * 2),
+    new THREE.MeshBasicMaterial({
+      visible: false
+    })
+  );
+  editorZPlane.stepSize = gridStep;
+
+  var grid = new THREE.GridHelper(gridSize, gridSegments, 0x444444, 0x444444);
+  grid.rotation.x = Math.PI * 0.5;
+  editorZPlane.add(grid);
+
+  engine.add(editorZPlane);
 
   ////////////////////////////
   // vue.js setup
@@ -37,12 +62,12 @@
       return {
         engine: engine,
         camera: camera,
-        controls: controls
+        controls: controls,
+        zPlane: editorZPlane
       }
     }
   });
   var Global = Vue.extend({template: '<div>global</div>'});
-  var Asteroid = Vue.extend({template: '<div>asteroid</div>'});
 
   var router = new VueRouter();
 
@@ -54,7 +79,7 @@
       component: EDITOR.CameraTool
     },
     '/asteroid': {
-      component: Asteroid
+      component: EDITOR.AsteroidTool
     }
   });
 

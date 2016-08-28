@@ -1,4 +1,4 @@
-GAME.GameObject = function(geometry, material, body) {
+ENGINE.GameObject = function(geometry, material, body) {
   THREE.Mesh.call(this, geometry, material);
 
   this.body = body;
@@ -10,16 +10,16 @@ GAME.GameObject = function(geometry, material, body) {
     this.rotation.z = this.body.angle;
   });
 };
-GAME.utils.extend(GAME.GameObject, THREE.Mesh);
+ENGINE.utils.extend(ENGINE.GameObject, THREE.Mesh);
 
-GAME.GameObject.prototype.update = function() {
+ENGINE.GameObject.prototype.update = function() {
   var object = this;
   this.scripts.forEach(function(s) {
     s.script.apply(object);
   })
 };
 
-GAME.GameObject.prototype.addScript = function(script, priority) {
+ENGINE.GameObject.prototype.addScript = function(script, priority) {
   this.scripts.push({script: script, priority: priority || 0});
   this.scripts.sort(function(a, b) {
     return a.priority < b.priority;

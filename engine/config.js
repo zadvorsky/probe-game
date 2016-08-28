@@ -1,3 +1,3 @@
-GAME.Config = {
+ENGINE.Config = {
 
 };

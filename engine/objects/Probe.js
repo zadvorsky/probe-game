@@ -1,4 +1,4 @@
-GAME.Probe = function() {
+ENGINE.Probe = function() {
 
   // THREE
 
@@ -15,7 +15,7 @@ GAME.Probe = function() {
   });
   body.addShape(shape);
 
-  GAME.GameObject.call(this, geometry, material, body);
+  ENGINE.GameObject.call(this, geometry, material, body);
 
   // THRUSTERS
 
@@ -31,20 +31,22 @@ GAME.Probe = function() {
     this.body.applyForce(force)
   }, 1);
 };
-GAME.utils.extend(GAME.Probe, GAME.GameObject);
+ENGINE.utils.extend(ENGINE.Probe, ENGINE.GameObject);
 
-GAME.Probe.prototype.setThrusterDirection = function(t) {
+ENGINE.Probe.prototype.setThrusterDirection = function(t) {
   this.thrusterDirection[0] = t[0];
   this.thrusterDirection[1] = t[1];
 };
 
-GAME.Probe.prototype.setCamera = function(camera) {
+ENGINE.Probe.prototype.setCamera = function(camera) {
   this.camera = camera;
   this.camera.position.z = 10;
   this.add(camera);
 };
 
-GAME.Probe.prototype.reset = function(camera) {
+ENGINE.Probe.prototype.reset = function(camera) {
   this.body.velocity[0] = this.body.position[0] = 0;
   this.body.velocity[1] = this.body.position[1] = 0;
+  this.body.angle = 0;
+  this.body.angularVelocity = 0;
 };

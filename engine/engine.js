@@ -8,7 +8,7 @@
 //=require objects/*.js
 //=require controllers/*.js
 
-GAME.Engine = function(container) {
+ENGINE.Engine = function(container) {
   // renderer
   this.container = container;
   this.initRenderer();
@@ -42,7 +42,7 @@ GAME.Engine = function(container) {
   this.tick();
 };
 
-GAME.Engine.prototype.initRenderer = function() {
+ENGINE.Engine.prototype.initRenderer = function() {
   var pixelRatio = window.devicePixelRatio;
   var antialias = (pixelRatio === 1);
 
@@ -52,20 +52,20 @@ GAME.Engine.prototype.initRenderer = function() {
   this.container.appendChild(this.renderer.domElement);
 };
 
-GAME.Engine.prototype.initProbe = function() {
-  this.probe = new GAME.Probe();
+ENGINE.Engine.prototype.initProbe = function() {
+  this.probe = new ENGINE.Probe();
   this.add(this.probe);
 
   this.probe.setCamera(this.cameras['game']);
 
-  this.inputController = new GAME.InputController(this.probe);
+  this.inputController = new ENGINE.InputController(this.probe);
 };
 
-GAME.Engine.prototype.reset = function() {
+ENGINE.Engine.prototype.reset = function() {
   this.probe.reset();
 };
 
-GAME.Engine.prototype.resize = function() {
+ENGINE.Engine.prototype.resize = function() {
   var width = window.innerWidth;
   var height = window.innerHeight;
 
@@ -78,7 +78,7 @@ GAME.Engine.prototype.resize = function() {
   this.renderer.setSize(width, height);
 };
 
-GAME.Engine.prototype.tick = function() {
+ENGINE.Engine.prototype.tick = function() {
   this.update();
   this.render();
 
@@ -89,7 +89,7 @@ GAME.Engine.prototype.tick = function() {
 // - paused/idle (editor default?)
 // - play
 
-GAME.Engine.prototype.update = function() {
+ENGINE.Engine.prototype.update = function() {
   if (this.paused === true) return;
 
   this.world.step(1/60);
@@ -100,27 +100,101 @@ GAME.Engine.prototype.update = function() {
   });
 };
 
-GAME.Engine.prototype.render = function() {
+ENGINE.Engine.prototype.render = function() {
   this.renderer.render(this.scene, this.activeCamera);
 };
 
-GAME.Engine.prototype.registerCamera = function(key, camera) {
+ENGINE.Engine.prototype.registerCamera = function(key, camera) {
   this.cameras[key] = camera;
 };
-GAME.Engine.prototype.activateCamera = function(key) {
+ENGINE.Engine.prototype.activateCamera = function(key) {
   this.activeCamera = this.cameras[key];
 };
 
-GAME.Engine.prototype.add = function(object) {
+ENGINE.Engine.prototype.add = function(object) {
   this.scene.add(object);
   object.body && this.world.addBody(object.body);
 };
-GAME.Engine.prototype.remove = function(object) {
+ENGINE.Engine.prototype.remove = function(object) {
   this.scene.remove(object);
   object.body && this.world.removeBody(object.body);
 };
 
 
 
-GAME.Engine.prototype.loadLevel = function(file, onComplete) {};
-GAME.Engine.prototype.createAsteroid = function(def) {};
+ENGINE.Engine.prototype.loadLevel = function(file, onComplete) {};
+ENGINE.Engine.prototype.createAsteroid = function(config) {
+  // GEOMETRY
+  
+  // 1. create shape
+  var shape = new THREE.Shape();
+  shape.moveTo(config.points[0].x, config.points[0].y);
+  
+  for (var i = 1; i < config.points.length; i++) {
+    shape.lineTo(config.points[i].x, config.points[i].y);
+  }
+  
+  // 2. extrude shape
+  var geometry = shape.extrude({
+    amount: 0,
+    bevelEnabled: true,
+    bevelSegments: 1,
+    steps: 1,
+    bevelSize: 0,
+    bevelThickness: config.extrudeDepth
+  });
+  
+  // 3. subdivide shape
+  new THREE.SubdivisionModifier(config.subdivisions).modify(geometry);
+  
+  // geometry.center();
+  
+  // MATERIAL
+  
+  // var material = new THREE.MeshStandardMaterial(config.material);
+  var material = new THREE.MeshBasicMaterial({
+    wireframe: true,
+    color: 0x00ffff,
+    transparent: true,
+    opacity: 0.1,
+    // visible: false
+  });
+  
+  // BODY
+  
+  var hull = [];
+  
+  geometry.vertices.forEach(function(v) {
+    if (v.z === 0) hull.push([v.x, v.y]);
+  });
+  
+  var temp = hull[0];
+  hull[0] = hull[1];
+  hull[1] = temp;
+  
+  var body = new p2.Body({
+    mass: 0,
+    position: [config.position.x, config.position.y]
+  });
+  console.log(body.fromPolygon(hull));
+  
+  console.log(body);
+  
+  // ASTEROID
+  
+  var asteroid = new ENGINE.GameObject(geometry, material, body);
+  asteroid.position.copy(config.position);
+  
+  for (i = 0; i < body.shapes.length; i++) {
+    var g = new THREE.Geometry();
+  
+    g.vertices = body.shapes[i].vertices.map(function(v) {
+      return new THREE.Vector3(v[0] + body.shapes[i].position[0], v[1] + body.shapes[i].position[1], 0);
+    });
+  
+    var hullLine = new THREE.Line(g, new THREE.LineBasicMaterial({color:0xff00ff}));
+    asteroid.add(hullLine);
+  }
+  
+  return asteroid;
+};

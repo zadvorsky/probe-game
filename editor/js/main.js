@@ -8,6 +8,7 @@
 //=require ../../bower_components/vue-router/dist/vue-router.js
 
 //=require init.js
+//=require objects/*.js
 //=require tools/*.js
 
 (function() {
@@ -20,7 +21,7 @@
   var uiContainer = document.querySelector('#ui-container');
 
   // engine
-  var engine = new GAME.Engine(engineContainer);
+  var engine = new ENGINE.Engine(engineContainer);
   engine.paused = true;
 
   // camera & camera controls
@@ -55,7 +56,41 @@
   editorZPlane.add(grid);
 
   engine.add(editorZPlane);
-
+  
+  ////////////////////////////
+  // mouse handling
+  ////////////////////////////
+  
+  var mouseNDC = new THREE.Vector2();
+  var raycaster = new THREE.Raycaster();
+  
+  engineContainer.addEventListener('mousemove', function(e) {
+    mouseNDC.set((e.clientX / window.innerWidth) * 2 - 1, -(e.clientY / window.innerHeight) * 2 + 1);
+  });
+  
+  function intersect(objects) {
+    raycaster.setFromCamera(mouseNDC, camera);
+    
+    if (Array.isArray(objects)) {
+      return raycaster.intersectObjects(objects);
+    }
+    else {
+      return raycaster.intersectObject(objects);
+    }
+  }
+  
+  ////////////////////////////
+  // asteroid handling
+  ////////////////////////////
+  
+  function storeAsteroid(config) {
+    var asteroid = engine.createAsteroid(config);
+    
+    engine.add(asteroid);
+    
+    // this.$root.engine.add(data.asteroid);
+  }
+  
   ////////////////////////////
   // vue.js setup
   ////////////////////////////
@@ -63,6 +98,11 @@
   Vue.use(VueRouter);
 
   var App = Vue.extend({
+    methods: {
+      intersect: intersect,
+      storeAsteroid: storeAsteroid
+    },
+    
     data: function() {
       return {
         engine: engine,
@@ -100,144 +140,28 @@
 
 
 
-  //var engineContainer = document.querySelector('#three-container');
-  //var uiContainer = document.querySelector('#ui-container');
-  //
-  //var engine = new GAME.Engine(engineContainer);
-  //engine.paused = true;
-  //
-  //var gridSize = 100;
-  //var gridSegments = 400;
-  //var gridStep = gridSize * 2 / gridSegments;
-  //
-  //var editorZPlane = new THREE.Mesh(
-  //  new THREE.PlaneBufferGeometry(gridSize * 2, gridSize * 2),
-  //  new THREE.MeshBasicMaterial({
-  //    visible: false
-  //  })
-  //);
-  //editorZPlane.rotation.x = Math.PI * -0.5;
-  //engine.add(editorZPlane);
-  //
-  //var grid = new THREE.GridHelper(gridSize, gridSegments, 0x444444, 0x444444);
-  //editorZPlane.add(grid);
-  //
-  //
-  //
-  //var camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.1, 100000);
-  //camera.position.z = 20;
-  //var controls = new THREE.OrbitControls(camera);
-  //controls.keys = false;
-  //engine.registerCamera('editor', camera);
-  //engine.activateCamera('editor');
-  //
-  //
-  //
   //// todo key to command map
-  //window.addEventListener('keyup', function(e) {
-  //  // p
-  //  if (e.keyCode === 80) {
-  //    engine.paused = !engine.paused;
-  //
-  //    if (engine.paused) {
-  //      uiContainer.style.display = 'block';
-  //      editorZPlane.visible = true;
-  //      engine.activateCamera('editor');
-  //    }
-  //    else {
-  //      uiContainer.style.display = 'none';
-  //      editorZPlane.visible = false;
-  //      engine.activateCamera('game');
-  //    }
-  //  }
-  //  // r
-  //  if (e.keyCode === 82) {
-  //    engine.reset();
-  //  }
-  //});
+  window.addEventListener('keyup', function(e) {
+   // p
+   if (e.keyCode === 80) {
+     engine.paused = !engine.paused;
 
-
-
-  //var mouseNDC = new THREE.Vector2();
-  //var rc = new THREE.Raycaster();
-  //
-  //var material = new THREE.LineBasicMaterial({color: 0xff0000});
-  //var geometry = new THREE.BufferGeometry();
-  //var MAX_POINTS = 500;
-  //var drawCount = 0;
-  //
-  //var positions = new Float32Array(MAX_POINTS * 3); // 3 vertices per point
-  //geometry.addAttribute('position', new THREE.BufferAttribute(positions, 3));
-  //geometry.setDrawRange(0, drawCount);
-  //
-  //var line = new THREE.Line(geometry, material);
-  //
-  //function appendPoint(p) {
-  //  geometry.attributes.position.array[drawCount * 3]     = p.x;
-  //  geometry.attributes.position.array[drawCount * 3 + 1] = p.y;
-  //  geometry.attributes.position.array[drawCount * 3 + 2] = p.z;
-  //  geometry.attributes.position.needsUpdate = true;
-  //
-  //  drawCount++;
-  //  geometry.setDrawRange(0, drawCount);
-  //}
-  //
-  //function updateLastPoint(p) {
-  //  var head = (drawCount - 1) * 3;
-  //
-  //  geometry.attributes.position.array[head]     = p.x;
-  //  geometry.attributes.position.array[head + 1] = p.y;
-  //  geometry.attributes.position.array[head + 2] = p.z;
-  //  geometry.attributes.position.needsUpdate = true;
-  //}
-  //
-  //var tracker = new THREE.Mesh(
-  //  new THREE.CircleGeometry(0.2, 16),
-  //  new THREE.MeshBasicMaterial({
-  //    color: 0xff0000,
-  //    transparent: true,
-  //    opacity: 0.5
-  //  })
-  //);
-  //engine.add(tracker);
-  //
-  //var firstPoint;
-  //
-  ////document.body.style.cursor = 'crosshair';
-  //
-  //engine.container.addEventListener('mousemove', function(e) {
-  //  mouseNDC.set((e.clientX / window.innerWidth) * 2 - 1, -(e.clientY / window.innerHeight) * 2 + 1);
-  //  updateLastPoint(tracker.position);
-  //});
-  //engine.container.addEventListener('click', function(e) {
-  //  if (drawCount === 0) {
-  //    engine.add(line);
-  //    firstPoint = tracker.position.clone();
-  //    appendPoint(tracker.position);
-  //  }
-  //
-  //  appendPoint(tracker.position);
-  //
-  //  if (drawCount > 2 && firstPoint.distanceTo(tracker.position) < 0.1 ) {
-  //    console.log('close the shape and generate stuff');
-  //  }
-  //});
-  //
-  //function update() {
-  //  rc.setFromCamera(mouseNDC, camera);
-  //  var intersects = rc.intersectObject(plane);
-  //
-  //  if (intersects) {
-  //    var p = intersects[0].point;
-  //    var x = Math.round(p.x / gridStep) * gridStep;
-  //    var y = Math.round(p.y / gridStep) * gridStep;
-  //
-  //    tracker.position.set(x, y, p.z);
-  //  }
-  //
-  //  requestAnimationFrame(update);
-  //}
-  //update();
+     if (engine.paused) {
+       uiContainer.style.display = 'block';
+       editorZPlane.visible = true;
+       engine.activateCamera('editor');
+     }
+     else {
+       uiContainer.style.display = 'none';
+       editorZPlane.visible = false;
+       engine.activateCamera('game');
+     }
+   }
+   // r
+   if (e.keyCode === 82) {
+     engine.reset();
+   }
+  });
 
 
 

@@ -1,1 +1,1 @@
-window.GAME = {};
+window.ENGINE = {};

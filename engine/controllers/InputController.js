@@ -1,4 +1,4 @@
-GAME.InputController = function(probe) {
+ENGINE.InputController = function(probe) {
   this.probe = probe;
   this.enabled = true;
 
@@ -37,6 +37,6 @@ GAME.InputController = function(probe) {
     }
   });
 };
-GAME.InputController.prototype.update = function() {
+ENGINE.InputController.prototype.update = function() {
   this.probe.setThrusterDirection(this.direction);
 };

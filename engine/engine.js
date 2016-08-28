@@ -156,7 +156,7 @@ ENGINE.Engine.prototype.createAsteroid = function(config) {
     wireframe: true,
     color: 0x00ffff,
     transparent: true,
-    opacity: 0.1,
+    opacity: 0.1
     // visible: false
   });
   
@@ -176,9 +176,16 @@ ENGINE.Engine.prototype.createAsteroid = function(config) {
     mass: 0,
     position: [config.position.x, config.position.y]
   });
+  
   console.log(body.fromPolygon(hull));
   
-  console.log(body);
+  // console.log(body.shapes[0].vertices[0], hull[0]);
+  
+  // var dx = body.shapes[0].vertices[0][0] - hull[0][0];
+  // var dy = body.shapes[0].vertices[0][1] - hull[0][1];
+  
+  // body.position[0] -= dx;
+  // body.position[1] -= dy;
   
   // ASTEROID
   
@@ -187,9 +194,10 @@ ENGINE.Engine.prototype.createAsteroid = function(config) {
   
   for (i = 0; i < body.shapes.length; i++) {
     var g = new THREE.Geometry();
-  
-    g.vertices = body.shapes[i].vertices.map(function(v) {
-      return new THREE.Vector3(v[0] + body.shapes[i].position[0], v[1] + body.shapes[i].position[1], 0);
+    var s = body.shapes[i];
+    
+    g.vertices = s.vertices.map(function(v) {
+      return new THREE.Vector3(v[0] + s.position[0], v[1] + s.position[1], 0);
     });
   
     var hullLine = new THREE.Line(g, new THREE.LineBasicMaterial({color:0xff00ff}));

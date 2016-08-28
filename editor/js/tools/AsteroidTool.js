@@ -6,15 +6,27 @@ EDITOR.AsteroidTool = Vue.extend({
       // this.$root.engine.remove(this.drawingLine);
       // this.$root.engine.remove(this.cursor);
       
+      var min = new THREE.Vector3(Infinity, Infinity, 0);
+      var max = new THREE.Vector3(-Infinity, -Infinity, 0);
+  
       for (var i = 0; i < this.drawingLine.points.length; i++) {
-        this.drawingLine.points[i].sub(this.asteroid.position);
+        var p = this.drawingLine.points[i];
+  
+        if (p.x < min.x) min.x = p.x;
+        if (p.y < min.y) min.y = p.y;
+        if (p.x > max.x) max.x = p.x;
+        if (p.y > max.y) max.y = p.y;
       }
+  
+      var center = new THREE.Vector3().addVectors(min, max).multiplyScalar(0.5);
       
-      this.drawingLine.computeBoundingBox();
+      for (i = 0; i < this.drawingLine.points.length; i++) {
+        this.drawingLine.points[i].sub(center);
+      }
       
       this.$root.storeAsteroid({
         points: this.drawingLine.points,
-        position: this.asteroid.position,
+        position: center,
         subdivisions: this.subdivisions,
         extrudeDepth: this.extrudeDepth,
         material: this.asteroidMaterial
@@ -46,24 +58,14 @@ EDITOR.AsteroidTool = Vue.extend({
 
     engine.container.style.cursor = 'crosshair';
     
-    this.asteroid = new THREE.Mesh(
-      new THREE.CircleGeometry(0.25, 4),
-      new THREE.MeshBasicMaterial({
-        color: 0xffffff
-      })
-    );
-
     var states = {
-      place: 0,
       draw: 1,
       complete: 2
     };
-    var state = states.place;
+    var state = states.draw;
     
     this.mouseMoveHandler = function(e) {
       switch (state) {
-        case states.place:
-          break;
         case states.draw:
           this.drawingLine.updateLastPoint(this.cursor.position);
           break;
@@ -74,11 +76,6 @@ EDITOR.AsteroidTool = Vue.extend({
     
     this.mouseClickHandler = function(e) {
       switch (state) {
-        case states.place:
-          this.asteroid.position.copy(this.cursor.position);
-          engine.add(this.asteroid);
-          state = states.draw;
-          break;
         case states.draw:
           this.drawingLine.appendPoint(this.cursor.position);
           this.drawingLine.isClosed() && (state = states.complete);

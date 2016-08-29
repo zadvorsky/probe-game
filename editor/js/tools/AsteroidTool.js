@@ -5,28 +5,9 @@ EDITOR.AsteroidTool = Vue.extend({
     generate: function() {
       // this.$root.engine.remove(this.drawingLine);
       // this.$root.engine.remove(this.cursor);
-      
-      var min = new THREE.Vector3(Infinity, Infinity, 0);
-      var max = new THREE.Vector3(-Infinity, -Infinity, 0);
-  
-      for (var i = 0; i < this.drawingLine.points.length; i++) {
-        var p = this.drawingLine.points[i];
-  
-        if (p.x < min.x) min.x = p.x;
-        if (p.y < min.y) min.y = p.y;
-        if (p.x > max.x) max.x = p.x;
-        if (p.y > max.y) max.y = p.y;
-      }
-  
-      var center = new THREE.Vector3().addVectors(min, max).multiplyScalar(0.5);
-      
-      for (i = 0; i < this.drawingLine.points.length; i++) {
-        this.drawingLine.points[i].sub(center);
-      }
-      
+
       this.$root.storeAsteroid({
         points: this.drawingLine.points,
-        position: center,
         subdivisions: this.subdivisions,
         extrudeDepth: this.extrudeDepth,
         material: this.asteroidMaterial
@@ -37,10 +18,11 @@ EDITOR.AsteroidTool = Vue.extend({
     return {
       asteroidMaterial: {
         color: 0x222222,
-        roughness: 1.0,
-        metalness: 0.0
+        roughness: 0.5,
+        metalness: 0.5,
+        shading: THREE.FlatShading
       },
-      extrudeDepth: 1,
+      extrudeDepth: 0.25,
       subdivisions: 1
     };
   },

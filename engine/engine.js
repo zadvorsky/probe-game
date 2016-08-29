@@ -146,19 +146,26 @@ ENGINE.Engine.prototype.createAsteroid = function(config) {
   
   // 3. subdivide shape
   new THREE.SubdivisionModifier(config.subdivisions).modify(geometry);
-  
-  // geometry.center();
-  
+
+  // 4. calculate center
+
+  geometry.computeBoundingBox();
+
+  var geometryCenter = geometry.boundingBox.center();
+
+  geometry.center();
+
   // MATERIAL
   
-  // var material = new THREE.MeshStandardMaterial(config.material);
-  var material = new THREE.MeshBasicMaterial({
-    wireframe: true,
-    color: 0x00ffff,
-    transparent: true,
-    opacity: 0.1
-    // visible: false
-  });
+  var material = new THREE.MeshStandardMaterial(config.material);
+
+  // test material
+  //var material = new THREE.MeshBasicMaterial({
+  //  wireframe: true,
+  //  color: 0x00ffff,
+  //  transparent: true,
+  //  opacity: 0.1
+  //});
   
   // BODY
   
@@ -167,42 +174,59 @@ ENGINE.Engine.prototype.createAsteroid = function(config) {
   geometry.vertices.forEach(function(v) {
     if (v.z === 0) hull.push([v.x, v.y]);
   });
-  
+
+  // swap first and second point because default order is wrong
   var temp = hull[0];
   hull[0] = hull[1];
   hull[1] = temp;
-  
+
   var body = new p2.Body({
     mass: 0,
-    position: [config.position.x, config.position.y]
+    position: [geometryCenter.x, geometryCenter.y]
   });
   
   console.log(body.fromPolygon(hull));
-  
-  // console.log(body.shapes[0].vertices[0], hull[0]);
-  
-  // var dx = body.shapes[0].vertices[0][0] - hull[0][0];
-  // var dy = body.shapes[0].vertices[0][1] - hull[0][1];
-  
-  // body.position[0] -= dx;
-  // body.position[1] -= dy;
-  
+
   // ASTEROID
   
   var asteroid = new ENGINE.GameObject(geometry, material, body);
-  asteroid.position.copy(config.position);
-  
-  for (i = 0; i < body.shapes.length; i++) {
-    var g = new THREE.Geometry();
-    var s = body.shapes[i];
-    
-    g.vertices = s.vertices.map(function(v) {
-      return new THREE.Vector3(v[0] + s.position[0], v[1] + s.position[1], 0);
-    });
-  
-    var hullLine = new THREE.Line(g, new THREE.LineBasicMaterial({color:0xff00ff}));
-    asteroid.add(hullLine);
-  }
-  
+  asteroid.position.copy(geometryCenter);
+
+  // adjust asteroid geometry to match with the p2 body
+  // TODO figure out why geomety and body do not match
+  var aabb = body.getAABB();
+  var bodyBox = new THREE.Box3(
+    new THREE.Vector3(aabb.lowerBound[0] - body.position[0], aabb.lowerBound[1] - body.position[1]),
+    new THREE.Vector3(aabb.upperBound[0] - body.position[0], aabb.upperBound[1] - body.position[1])
+  );
+  var offset = new THREE.Vector3().subVectors(bodyBox.min, geometry.boundingBox.min);
+
+  geometry.translate(offset.x, offset.y, 0);
+
+  // body shapes debug geometry
+  //for (i = 0; i < body.shapes.length; i++) {
+  //  var g = new THREE.Geometry();
+  //  var s = body.shapes[i];
+  //
+  //  g.vertices = s.vertices.map(function(v) {
+  //    return new THREE.Vector3(v[0], v[1], 0);
+  //  });
+  //
+  //  var hullLine = new THREE.Line(g, new THREE.LineBasicMaterial({color:0xff00ff}));
+  //  hullLine.position.x = s.position[0];
+  //  hullLine.position.y = s.position[1];
+  //  asteroid.add(hullLine);
+  //
+  //  hullLine.add(new THREE.Mesh(
+  //    new THREE.CircleGeometry(0.1, 4),
+  //    new THREE.MeshBasicMaterial({
+  //      color: 0xff00ff
+  //    })
+  //  ));
+  //}
+
+  // update to align body and mesh
+  asteroid.update();
+
   return asteroid;
 };

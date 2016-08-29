@@ -11,11 +11,17 @@ ENGINE.Probe = function() {
     radius: 1.0
   });
   var body = new p2.Body({
-    mass: 1.0
+    mass: 1.0,
+    angularDamping: 0.25
   });
   body.addShape(shape);
 
   ENGINE.GameObject.call(this, geometry, material, body);
+
+  // LIGHT
+
+  var light = new THREE.PointLight(0xffffff, 1.0, 16.0, 2);
+  this.add(light);
 
   // THRUSTERS
 
@@ -28,7 +34,7 @@ ENGINE.Probe = function() {
     force[0] = this.thrusterDirection[0] * thrusterPower;
     force[1] = this.thrusterDirection[1] * thrusterPower;
 
-    this.body.applyForce(force)
+    this.body.applyForceLocal(force)
   }, 1);
 };
 ENGINE.utils.extend(ENGINE.Probe, ENGINE.GameObject);

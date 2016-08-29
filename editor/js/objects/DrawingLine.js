@@ -53,3 +53,14 @@ EDITOR.DrawingLine.prototype.isClosed = function() {
   
   return isClosed;
 };
+
+EDITOR.DrawingLine.prototype.reset = function() {
+  this.drawCount = 0;
+  this.points.length = 0;
+
+  var a = this.geometry.attributes.position.array;
+
+  for (var i = 0; i < a.length; i++) {
+    a[i] = 0;
+  }
+};

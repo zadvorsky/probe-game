@@ -6,6 +6,7 @@
 //=require ../../bower_components/three.js/examples/js/modifiers/SubdivisionModifier.js
 //=require ../../bower_components/vue/dist/vue.js
 //=require ../../bower_components/vue-router/dist/vue-router.js
+//=require ../../bower_components/vue-resource/dist/vue-resource.js
 
 //=require init.js
 //=require objects/*.js
@@ -84,8 +85,14 @@
   ////////////////////////////
   
   function storeAsteroid(config) {
-    var asteroid = engine.createAsteroid(config);
-    
+    var data = JSON.parse(JSON.stringify(config));
+
+    var asteroid = engine.createAsteroid(data);
+
+    currentLevel.asteroids.push(data);
+
+    saveCurrentLevel();
+
     engine.add(asteroid);
     
     // this.$root.engine.add(data.asteroid);
@@ -96,6 +103,11 @@
   ////////////////////////////
 
   Vue.use(VueRouter);
+  Vue.use(VueResource);
+
+  var currentLevel = {
+    asteroids: []
+  };
 
   var App = Vue.extend({
     methods: {
@@ -128,19 +140,31 @@
     }
   });
 
-  //router.beforeEach(function(t) {
-  //  console.log('before each', t);
-  //});
+  //router.beforeEach(function(t) {});
 
   router.start(App, '#app');
 
+  router.app.$http.post('/load', {name:'level_1.json'}).then(function(resp) {
+    console.log('loaded levels', resp);
+    currentLevel = resp.data;
+    engine.parseLevelJSON(resp.data);
+  });
 
+  function saveCurrentLevel() {
+    var data = {
+      level_name: 'level_1',
+      level_data: currentLevel
+      //level_data: {asteroids: []}
+    };
 
+    console.log('saving..', currentLevel);
 
+    router.app.$http.post('/save', data).then(function(resp) {
+      console.log('level saved', resp);
+    });
+  }
 
-
-
-  //// todo key to command map
+  // todo key to command map
   window.addEventListener('keyup', function(e) {
    // p
    if (e.keyCode === 80) {
@@ -162,12 +186,6 @@
      engine.reset();
    }
   });
-
-
-
-
-
-
 })();
 
 

@@ -130,7 +130,13 @@ ENGINE.Engine.prototype.remove = function(object) {
 
 
 
-ENGINE.Engine.prototype.loadLevel = function(file, onComplete) {};
+ENGINE.Engine.prototype.parseLevelJSON = function(json) {
+  // asteroids
+  json.asteroids.forEach(function(data) {
+    var asteroid = this.createAsteroid(data);
+    this.add(asteroid);
+  }.bind(this));
+};
 ENGINE.Engine.prototype.createAsteroid = function(config) {
   // GEOMETRY
   
@@ -189,7 +195,7 @@ ENGINE.Engine.prototype.createAsteroid = function(config) {
   contour[1] = temp;
 
   var body = new p2.Body({
-    mass: 0,
+    mass: 10,
     position: [geometryCenter.x, geometryCenter.y]
   });
   

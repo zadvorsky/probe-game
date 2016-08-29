@@ -12,6 +12,9 @@ EDITOR.AsteroidTool = Vue.extend({
         extrudeDepth: this.extrudeDepth,
         material: this.asteroidMaterial
       });
+
+      this.drawingLine.reset();
+      this.state = this.states.draw;
     }
   },
   data: function() {
@@ -40,29 +43,29 @@ EDITOR.AsteroidTool = Vue.extend({
 
     engine.container.style.cursor = 'crosshair';
     
-    var states = {
+    this.states = {
       draw: 1,
       complete: 2
     };
-    var state = states.draw;
+    this.state = this.states.draw;
     
     this.mouseMoveHandler = function(e) {
-      switch (state) {
-        case states.draw:
+      switch (this.state) {
+        case this.states.draw:
           this.drawingLine.updateLastPoint(this.cursor.position);
           break;
-        case states.complete:
+        case this.states.complete:
           break;
       }
     }.bind(this);
     
     this.mouseClickHandler = function(e) {
-      switch (state) {
-        case states.draw:
+      switch (this.state) {
+        case this.states.draw:
           this.drawingLine.appendPoint(this.cursor.position);
-          this.drawingLine.isClosed() && (state = states.complete);
+          this.drawingLine.isClosed() && (this.state = this.states.complete);
           break;
-        case states.complete:
+        case this.states.complete:
           break;
       }
     }.bind(this);

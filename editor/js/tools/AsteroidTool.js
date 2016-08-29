@@ -17,7 +17,7 @@ EDITOR.AsteroidTool = Vue.extend({
   data: function() {
     return {
       asteroidMaterial: {
-        color: 0x222222,
+        color: 0x666666,
         roughness: 0.5,
         metalness: 0.5,
         shading: THREE.FlatShading

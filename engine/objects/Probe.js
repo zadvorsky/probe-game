@@ -20,8 +20,18 @@ ENGINE.Probe = function() {
 
   // LIGHT
 
-  var light = new THREE.PointLight(0xffffff, 1.0, 16.0, 2);
+  var light = new THREE.PointLight(0xff0000, 1, 30);
+  light.position.z = 0;
+  light.castShadow = true;
+  light.shadow.camera.near = 0.1;
+  light.shadow.camera.far = 30;
+  light.shadow.bias = 0.01;
   this.add(light);
+
+  //this.add(new THREE.CameraHelper(light.shadow.camera));
+
+  this.castShadow = false;
+  this.receiveShadow = false;
 
   // THRUSTERS
 

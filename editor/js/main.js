@@ -34,9 +34,9 @@
   engine.activateCamera('editor');
 
   // lights?
-  var light = new THREE.DirectionalLight();
-  light.position.set(0, 0, 1);
-  engine.add(light);
+  //var light = new THREE.DirectionalLight(0xffffff, 0.25);
+  //light.position.set(0, 0, 1);
+  //engine.add(light);
 
   // grid / editing pane
   var gridSize = 100;

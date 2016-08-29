@@ -16,6 +16,8 @@ ENGINE.Engine = function(container) {
   // scene
   this.scene = new THREE.Scene();
 
+  window.scene = this.scene;
+
   // camera
   this.cameras = {};
   this.registerCamera('game', new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.1, 10000));
@@ -48,6 +50,12 @@ ENGINE.Engine.prototype.initRenderer = function() {
 
   this.renderer = new THREE.WebGLRenderer({antialias: antialias});
   this.renderer.setPixelRatio(pixelRatio);
+  this.renderer.setClearColor(0x111111);
+
+  this.renderer.shadowMap.enabled = true;
+  this.renderer.shadowMap.type = THREE.BasicShadowMap;
+  //this.renderer.shadowMap.type = THREE.PCFShadowMap;
+  //this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 
   this.container.appendChild(this.renderer.domElement);
 };
@@ -169,31 +177,36 @@ ENGINE.Engine.prototype.createAsteroid = function(config) {
   
   // BODY
   
-  var hull = [];
+  var contour = [];
   
   geometry.vertices.forEach(function(v) {
-    if (v.z === 0) hull.push([v.x, v.y]);
+    if (v.z === 0) contour.push([v.x, v.y]);
   });
 
   // swap first and second point because default order is wrong
-  var temp = hull[0];
-  hull[0] = hull[1];
-  hull[1] = temp;
+  var temp = contour[0];
+  contour[0] = contour[1];
+  contour[1] = temp;
 
   var body = new p2.Body({
     mass: 0,
     position: [geometryCenter.x, geometryCenter.y]
   });
   
-  console.log(body.fromPolygon(hull));
+  if (!body.fromPolygon(contour)) {
+    console.log('error generating p2.shapes');
+  }
 
   // ASTEROID
   
   var asteroid = new ENGINE.GameObject(geometry, material, body);
   asteroid.position.copy(geometryCenter);
+  asteroid.castShadow = true;
+  asteroid.receiveShadow = true;
 
   // adjust asteroid geometry to match with the p2 body
-  // TODO figure out why geomety and body do not match
+  // TODO figure out why geometry and body do not match
+  // TODO simplify calculation
   var aabb = body.getAABB();
   var bodyBox = new THREE.Box3(
     new THREE.Vector3(aabb.lowerBound[0] - body.position[0], aabb.lowerBound[1] - body.position[1]),

@@ -37,6 +37,8 @@ ENGINE.Engine = function(container) {
   // objects
   this.initProbe();
 
+  this.asteroids = [];
+  
   // tick/update/render
   this.paused = false;
 
@@ -128,7 +130,13 @@ ENGINE.Engine.prototype.remove = function(object) {
   object.body && this.world.removeBody(object.body);
 };
 
-
+ENGINE.Engine.prototype.clear = function() {
+  // asteroids
+  this.asteroids.forEach(function(a) {
+    this.remove(a);
+  }.bind(this));
+  this.asteroids.length = 0;
+};
 
 ENGINE.Engine.prototype.parseLevelJSON = function(json) {
   // asteroids
@@ -194,8 +202,9 @@ ENGINE.Engine.prototype.createAsteroid = function(config) {
   contour[0] = contour[1];
   contour[1] = temp;
 
+  // todo add support for dynamic asteroids (needs reset)
   var body = new p2.Body({
-    mass: 10,
+    mass: 0,
     position: [geometryCenter.x, geometryCenter.y]
   });
   
@@ -247,5 +256,8 @@ ENGINE.Engine.prototype.createAsteroid = function(config) {
   // update to align body and mesh
   asteroid.update();
 
+  this.add(asteroid);
+  this.asteroids.push(asteroid);
+  
   return asteroid;
 };

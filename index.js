@@ -33,8 +33,8 @@ app.post('/load', function(req, res) {
 
 app.post('/save', function(req, res) {
   var data = req.body;
-  var levelName = data.level_name;
-  var levelData = data.level_data;
+  var levelName = data.name;
+  var levelData = data;
   var fileName = path.join(LEVELS_DIR + levelName + '.json');
   
   jsonfile.writeFile(fileName, levelData, function(error) {

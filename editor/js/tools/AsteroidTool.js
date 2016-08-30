@@ -3,16 +3,17 @@ EDITOR.AsteroidTool = Vue.extend({
 
   methods: {
     generate: function() {
-      // this.$root.engine.remove(this.drawingLine);
-      // this.$root.engine.remove(this.cursor);
-
-      this.$root.storeAsteroid({
+      var clonedData = JSON.parse(JSON.stringify({
         points: this.drawingLine.points,
         subdivisions: this.subdivisions,
         extrudeDepth: this.extrudeDepth,
         material: this.asteroidMaterial
-      });
-
+      }));
+      
+      this.$root.storeAsteroid(clonedData);
+      this.reset();
+    },
+    reset: function() {
       this.drawingLine.reset();
       this.state = this.states.draw;
     }

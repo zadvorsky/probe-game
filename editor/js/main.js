@@ -28,7 +28,7 @@
   // camera & camera controls
   var camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.1, 100000);
   camera.position.z = 20;
-  var controls = new THREE.OrbitControls(camera);
+  var controls = new THREE.OrbitControls(camera, engineContainer);
   controls.keys = false;
   controls.enableRotate = false;
   engine.registerCamera('editor', camera);
@@ -81,24 +81,6 @@
   }
   
   ////////////////////////////
-  // asteroid handling
-  ////////////////////////////
-  
-  function storeAsteroid(config) {
-    var data = JSON.parse(JSON.stringify(config));
-
-    var asteroid = engine.createAsteroid(data);
-
-    currentLevel.asteroids.push(data);
-
-    saveCurrentLevel();
-
-    engine.add(asteroid);
-    
-    // this.$root.engine.add(data.asteroid);
-  }
-  
-  ////////////////////////////
   // vue.js setup
   ////////////////////////////
 
@@ -112,7 +94,54 @@
   var App = Vue.extend({
     methods: {
       intersect: intersect,
-      storeAsteroid: storeAsteroid
+      
+      storeAsteroid: function(data) {
+        // create & add to engine
+        engine.createAsteroid(data);
+        // store data
+        this.level.asteroids.push(data);
+        // this.saveLevel();
+      },
+      
+      saveLevel: function() {
+        this.$http.post('/save', this.level).then(function(resp) {
+          console.log('level saved', resp);
+          
+          // maybe? or return the list of file names in node
+          this.loadLevels();
+        });
+      },
+        
+      clearLevel: function() {
+        engine.clear();
+        this.level.asteroids && (this.level.asteroids.length = 0);
+      },
+      
+      createLevel: function(name) {
+        this.clearLevel();
+        
+        this.level = {
+          name: name,
+          asteroids: []
+        }
+      },
+      
+      loadLevels: function() {
+        this.$http.post('/levels').then(function(resp) {
+          console.log('loaded levels', resp);
+          this.levels = resp.data;
+        });
+      },
+      loadLevel: function(name) {
+        this.clearLevel();
+  
+        // note to self: name is INC extension here, without extension is create and save
+        this.$http.post('/load', {name:name}).then(function(resp) {
+          console.log('loaded level', resp);
+          this.level = resp.data;
+          engine.parseLevelJSON(this.level);
+        });
+      }
     },
     
     data: function() {
@@ -120,17 +149,19 @@
         engine: engine,
         camera: camera,
         controls: controls,
-        zPlane: editorZPlane
+        zPlane: editorZPlane,
+  
+        levels: [],
+        level: {}
       }
     }
   });
-  var Global = Vue.extend({template: '<div>global</div>'});
 
   var router = new VueRouter();
 
   router.map({
-    '/global': {
-      component: Global
+    '/level': {
+      component: EDITOR.LevelsTool
     },
     '/camera': {
       component: EDITOR.CameraTool
@@ -143,27 +174,8 @@
   //router.beforeEach(function(t) {});
 
   router.start(App, '#app');
-
-  router.app.$http.post('/load', {name:'level_1.json'}).then(function(resp) {
-    console.log('loaded levels', resp);
-    currentLevel = resp.data;
-    engine.parseLevelJSON(resp.data);
-  });
-
-  function saveCurrentLevel() {
-    var data = {
-      level_name: 'level_1',
-      level_data: currentLevel
-      //level_data: {asteroids: []}
-    };
-
-    console.log('saving..', currentLevel);
-
-    router.app.$http.post('/save', data).then(function(resp) {
-      console.log('level saved', resp);
-    });
-  }
-
+  router.app.loadLevels();
+  
   // todo key to command map
   window.addEventListener('keyup', function(e) {
    // p

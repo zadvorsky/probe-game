@@ -87,10 +87,6 @@
   Vue.use(VueRouter);
   Vue.use(VueResource);
 
-  var currentLevel = {
-    asteroids: []
-  };
-
   var App = Vue.extend({
     methods: {
       intersect: intersect,
@@ -102,7 +98,17 @@
         this.level.asteroids.push(data);
         // this.saveLevel();
       },
-      
+
+      createLevel: function(name) {
+        this.clearLevel();
+
+        this.level = {
+          name: name,
+          asteroids: []
+        };
+
+        this.saveLevel();
+      },
       saveLevel: function() {
         this.$http.post('/save', this.level).then(function(resp) {
           console.log('level saved', resp);
@@ -111,21 +117,10 @@
           this.loadLevels();
         });
       },
-        
       clearLevel: function() {
         engine.clear();
         this.level.asteroids && (this.level.asteroids.length = 0);
       },
-      
-      createLevel: function(name) {
-        this.clearLevel();
-        
-        this.level = {
-          name: name,
-          asteroids: []
-        }
-      },
-      
       loadLevels: function() {
         this.$http.post('/levels').then(function(resp) {
           console.log('loaded levels', resp);
@@ -171,8 +166,6 @@
     }
   });
 
-  //router.beforeEach(function(t) {});
-
   router.start(App, '#app');
   router.app.loadLevels();
   
@@ -199,58 +192,3 @@
    }
   });
 })();
-
-
-
-
-
-
-
-//var levels = [];
-//
-//function loadLevel(name) {
-//  var request = new XMLHttpRequest();
-//  request.open('POST', 'http://localhost:3000/load', true);
-//  request.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
-//  request.onload = function(e) {
-//    console.log('level loaded', JSON.parse(e.target.response));
-//  };
-//  request.send(JSON.stringify({name: name}));
-//}
-//
-//function loadLevels() {
-//  var request = new XMLHttpRequest();
-//  request.open('POST', 'http://localhost:3000/levels', true);
-//  request.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
-//  request.onload = function(e) {
-//    levels = JSON.parse(e.target.response);
-//
-//    console.log('levels loaded', levels);
-//
-//    loadLevel(levels[0]);
-//  };
-//  request.send();
-//}
-//
-//loadLevels();
-//
-//function save() {
-//  var data = {
-//    level_name: 'level_1',
-//    level_data: {
-//      obj_1: {
-//        vertices: [
-//          {x: 0, y: 0}
-//        ]
-//      }
-//    }
-//  };
-//
-//  var request = new XMLHttpRequest();
-//  request.open('POST', 'http://localhost:3000/save', true);
-//  request.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
-//  request.onload = function(e) {
-//    console.log('ONLOAD', e);
-//  };
-//  request.send(JSON.stringify(data));
-//}

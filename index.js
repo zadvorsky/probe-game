@@ -43,6 +43,14 @@ app.post('/save', function(req, res) {
   });
 });
 
+// do we need this?
+//app.post('/delete', function(req, res) {
+//  fs.unlink(path.join(LEVELS_DIR + req.body.name), function(error) {
+//    if (error) console.log('/delete error', error);
+//    else res.send('level deleted');
+//  });
+//});
+
 // RUN
 
 app.listen(PORT, function() {

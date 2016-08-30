@@ -8,29 +8,46 @@ EDITOR.AsteroidTool = Vue.extend({
       <div><span>mass</span><input type="number" v-model="mass"></div>
       <div><button v-on:click="generate">generate</button></div>
       <div><button v-on:click="reset">reset</button></div>
+      <div><button v-on:click="store">store</button></div>
     </div>
   `,
 
   methods: {
+    destroyAsteroid: function() {
+      if (this.asteroid) {
+        this.$root.engine.remove(this.asteroid);
+        this.asteroid = null;
+      }
+    },
+
     generate: function() {
-      var clonedData = JSON.parse(JSON.stringify({
-        points: this.drawingLine.points,
-        subdivisions: this.subdivisions,
-        extrudeDepth: this.extrudeDepth,
-        material: this.material,
-        mass: this.mass
-      }));
-      
-      this.$root.storeAsteroid(clonedData);
+      this.destroyAsteroid();
+
+      this.asteroid = this.$root.engine.createAsteroid(this.$data);
+    },
+
+    store: function() {
+      var clonedData = JSON.parse(JSON.stringify(this.$data));
+
+      this.$root.storeAsteroid(clonedData, this.asteroid);
+      this.asteroid = null;
       this.reset();
     },
+
     reset: function() {
+      if (this.asteroid) {
+        this.$root.engine.remove(this.asteroid);
+      }
+      this.asteroid = null;
+
       this.drawingLine.reset();
       this.state = this.states.draw;
     }
   },
   data: function() {
     return {
+      points: [],
+
       material: {
         color: '#666666',
         roughness: 0.5,
@@ -50,7 +67,7 @@ EDITOR.AsteroidTool = Vue.extend({
     this.cursor = new EDITOR.Cursor(0.2);
     engine.add(this.cursor);
     
-    this.drawingLine = new EDITOR.DrawingLine();
+    this.drawingLine = new EDITOR.DrawingLine(this.points);
     engine.add(this.drawingLine);
 
     engine.container.style.cursor = 'crosshair';
@@ -104,6 +121,8 @@ EDITOR.AsteroidTool = Vue.extend({
   },
 
   beforeDestroy: function() {
+    this.destroyAsteroid();
+
     this.$root.engine.container.style.cursor = '';
     
     this.$root.engine.remove(this.drawingLine);

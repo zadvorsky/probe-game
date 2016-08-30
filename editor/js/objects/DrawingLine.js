@@ -1,4 +1,4 @@
-EDITOR.DrawingLine = function() {
+EDITOR.DrawingLine = function(points) {
   var material = new THREE.LineBasicMaterial({color: 0xff0000});
   var geometry = new THREE.BufferGeometry();
   var MAX_POINTS = 500;
@@ -9,7 +9,7 @@ EDITOR.DrawingLine = function() {
   
   THREE.Line.call(this, geometry, material);
   
-  this.points = [];
+  this.points = points;
   this.drawCount = 0;
   this.visible = false;
 };

@@ -90,14 +90,11 @@
   var App = Vue.extend({
     methods: {
       intersect: intersect,
-      
-      storeAsteroid: function(data) {
-        // create & add to engine
-        var asteroid = engine.createAsteroid(data);
 
-        console.log('created asteroid ' + asteroid.id + ' from data', data);
+      storeAsteroid: function(data, asteroid) {
 
-        // store data
+        console.log('store asteroid', data, asteroid);
+
         this.level.asteroids.push(data);
         // this.saveLevel();
       },
@@ -138,7 +135,7 @@
         this.$http.post('/load', {name:name}).then(function(resp) {
           console.log('loaded level ' + name, resp.data);
           this.level = resp.data;
-          
+
           engine.parseLevelJSON(this.level);
         });
       }

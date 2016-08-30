@@ -93,7 +93,10 @@
       
       storeAsteroid: function(data) {
         // create & add to engine
-        engine.createAsteroid(data);
+        var asteroid = engine.createAsteroid(data);
+
+        console.log('created asteroid ' + asteroid.id + ' from data', data);
+
         // store data
         this.level.asteroids.push(data);
         // this.saveLevel();
@@ -111,7 +114,7 @@
       },
       saveLevel: function() {
         this.$http.post('/save', this.level).then(function(resp) {
-          console.log('level saved', resp);
+          console.log('saved level ' + this.level.name);
           
           // maybe? or return the list of file names in node
           this.loadLevels();
@@ -123,8 +126,9 @@
       },
       loadLevels: function() {
         this.$http.post('/levels').then(function(resp) {
-          console.log('loaded levels', resp);
+          console.log('loaded levels', resp.data);
           this.levels = resp.data;
+          this.loadLevel(this.levels[0]);
         });
       },
       loadLevel: function(name) {
@@ -132,8 +136,9 @@
   
         // note to self: name is INC extension here, without extension is create and save
         this.$http.post('/load', {name:name}).then(function(resp) {
-          console.log('loaded level', resp);
+          console.log('loaded level ' + name, resp.data);
           this.level = resp.data;
+          
           engine.parseLevelJSON(this.level);
         });
       }

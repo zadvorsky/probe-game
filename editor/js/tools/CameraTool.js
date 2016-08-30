@@ -4,6 +4,7 @@ EDITOR.CameraTool = Vue.extend({
   methods: {
     reset: function () {
       this.$root.controls.object.position.set(0, 0, 20);
+      this.$root.controls.target.set(0, 0, 0);
       this.$root.controls.update();
     }
   },

@@ -73,6 +73,15 @@ ENGINE.Engine.prototype.initProbe = function() {
 
 ENGINE.Engine.prototype.reset = function() {
   this.probe.reset();
+
+  this.asteroids.forEach(function(a) {
+    a.body.velocity[0] = 0;
+    a.body.velocity[1] = 0;
+    a.body.position[0] = a.userData.defaultPosition.x;
+    a.body.position[1] = a.userData.defaultPosition.y;
+    a.body.angle = 0;
+    a.body.angularVelocity = 0;
+  });
 };
 
 ENGINE.Engine.prototype.resize = function() {
@@ -179,7 +188,9 @@ ENGINE.Engine.prototype.createAsteroid = function(config) {
 
   // MATERIAL
   
-  var material = new THREE.MeshStandardMaterial(config.material);
+  var material = new THREE.MeshStandardMaterial(Object.assign({
+    shading: THREE.FlatShading
+  }, config.material));
 
   // test material
   //var material = new THREE.MeshBasicMaterial({
@@ -202,9 +213,8 @@ ENGINE.Engine.prototype.createAsteroid = function(config) {
   contour[0] = contour[1];
   contour[1] = temp;
 
-  // todo add support for dynamic asteroids (needs reset)
   var body = new p2.Body({
-    mass: 0,
+    mass: config.mass || 0,
     position: [geometryCenter.x, geometryCenter.y]
   });
   
@@ -258,6 +268,9 @@ ENGINE.Engine.prototype.createAsteroid = function(config) {
 
   this.add(asteroid);
   this.asteroids.push(asteroid);
-  
+
+  // store data for engine reset / level replay
+  asteroid.userData.defaultPosition = geometryCenter;
+
   return asteroid;
 };

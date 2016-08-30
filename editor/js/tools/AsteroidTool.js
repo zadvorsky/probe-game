@@ -1,5 +1,15 @@
 EDITOR.AsteroidTool = Vue.extend({
-  template: '<button v-on:click="generate">generate</button>',
+  template: `
+    <div>
+      <div><span>extrude</span><input type="number" v-model="extrudeDepth"></div>
+      <div><span>color</span><input type="text" v-model="material.color"></div>
+      <div><span>roughness</span><input type="number" v-model="material.roughness"></div>
+      <div><span>metalness</span><input type="number" v-model="material.metalness"></div>
+      <div><span>mass</span><input type="number" v-model="mass"></div>
+      <div><button v-on:click="generate">generate</button></div>
+      <div><button v-on:click="reset">reset</button></div>
+    </div>
+  `,
 
   methods: {
     generate: function() {
@@ -7,7 +17,8 @@ EDITOR.AsteroidTool = Vue.extend({
         points: this.drawingLine.points,
         subdivisions: this.subdivisions,
         extrudeDepth: this.extrudeDepth,
-        material: this.asteroidMaterial
+        material: this.material,
+        mass: this.mass
       }));
       
       this.$root.storeAsteroid(clonedData);
@@ -20,14 +31,14 @@ EDITOR.AsteroidTool = Vue.extend({
   },
   data: function() {
     return {
-      asteroidMaterial: {
-        color: 0x666666,
+      material: {
+        color: '#666666',
         roughness: 0.5,
-        metalness: 0.5,
-        shading: THREE.FlatShading
+        metalness: 0.5
       },
       extrudeDepth: 0.25,
-      subdivisions: 1
+      subdivisions: 1,
+      mass: 0
     };
   },
 
@@ -61,6 +72,8 @@ EDITOR.AsteroidTool = Vue.extend({
     }.bind(this);
     
     this.mouseClickHandler = function(e) {
+      if (e.which !== 1) return;
+
       switch (this.state) {
         case this.states.draw:
           this.drawingLine.appendPoint(this.cursor.position);

@@ -60,7 +60,7 @@ ENGINE.Probe.prototype.setCamera = function(camera) {
   this.add(camera);
 };
 
-ENGINE.Probe.prototype.reset = function(camera) {
+ENGINE.Probe.prototype.reset = function() {
   this.body.velocity[0] = this.body.position[0] = 0;
   this.body.velocity[1] = this.body.position[1] = 0;
   this.body.angle = 0;

@@ -23,13 +23,163 @@ EDITOR.AsteroidTool = Vue.extend({
     generate: function() {
       this.destroyAsteroid();
 
-      this.asteroid = this.$root.engine.createAsteroid(this.$data);
+      var shape = new THREE.Shape();
+      shape.moveTo(this.points[0].x, this.points[0].y);
+
+      for (var i = 1; i < this.points.length; i++) {
+        shape.lineTo(this.points[i].x, this.points[i].y);
+      }
+
+      // 2. extrude shape
+      var geometry = shape.extrude({
+        amount: 0,
+        bevelEnabled: true,
+        bevelSegments: 1,
+        steps: 1,
+        bevelSize: 0,
+        bevelThickness: this.extrudeDepth
+      });
+
+      // 3. subdivide shape
+      new THREE.SubdivisionModifier(this.subdivisions).modify(geometry);
+
+      // 4. calculate center
+
+      var geometryCenter = new THREE.Vector3();
+      geometry.computeBoundingBox();
+      geometry.boundingBox.center(geometryCenter);
+      geometry.center();
+
+      // MATERIAL
+
+      var material = new THREE.MeshStandardMaterial(Object.assign({
+        shading: THREE.FlatShading
+      }, this.material));
+
+      // test material
+      //var material = new THREE.MeshBasicMaterial({
+      //  wireframe: true,
+      //  color: 0x00ffff,
+      //  transparent: true,
+      //  opacity: 0.1
+      //});
+
+      // BODY
+
+      var contour = [];
+
+      geometry.vertices.forEach(function(v) {
+        if (v.z === 0) contour.push([v.x, v.y]);
+      });
+
+      // swap first and second point because default order is wrong
+      var temp = contour[0];
+      contour[0] = contour[1];
+      contour[1] = temp;
+
+      var body = new p2.Body({
+        mass: this.mass || 0,
+        position: [geometryCenter.x, geometryCenter.y]
+      });
+
+      if (!body.fromPolygon(contour)) {
+        console.log('error generating p2.shapes');
+      }
+
+      // ASTEROID
+
+      var asteroid = new ENGINE.GameObject(geometry, material, body);
+      asteroid.position.copy(geometryCenter);
+      asteroid.castShadow = true;
+      asteroid.receiveShadow = true;
+
+      // adjust asteroid geometry to match with the p2 body
+      // TODO figure out why geometry and body do not match
+      // TODO simplify calculation
+      var aabb = body.getAABB();
+      var bodyBox = new THREE.Box3(
+        new THREE.Vector3(aabb.lowerBound[0] - body.position[0], aabb.lowerBound[1] - body.position[1]),
+        new THREE.Vector3(aabb.upperBound[0] - body.position[0], aabb.upperBound[1] - body.position[1])
+      );
+      var offset = new THREE.Vector3().subVectors(bodyBox.min, geometry.boundingBox.min);
+
+      geometry.translate(offset.x, offset.y, 0);
+
+      // body shapes debug geometry
+      for (i = 0; i < body.shapes.length; i++) {
+        var g = new THREE.Geometry();
+        var s = body.shapes[i];
+
+        g.vertices = s.vertices.map(function(v) {
+          return new THREE.Vector3(v[0], v[1], 0);
+        });
+
+        var hullLine = new THREE.Line(g, new THREE.LineBasicMaterial({color:0xff00ff}));
+        hullLine.position.x = s.position[0];
+        hullLine.position.y = s.position[1];
+        asteroid.add(hullLine);
+
+        hullLine.add(new THREE.Mesh(
+          new THREE.CircleGeometry(0.1, 4),
+          new THREE.MeshBasicMaterial({
+            color: 0xff00ff
+          })
+        ));
+      }
+
+      asteroid.update();
+
+      asteroid.userData.defaultPosition = geometryCenter;
+
+      this.asteroid = asteroid;
+
+      this.$root.engine.add(this.asteroid);
+
+      console.log('--created--');
+
+      console.log(asteroid.body.shapes);
+
+      //this.asteroid = this.$root.engine.createAsteroid(this.$data);
     },
 
     store: function() {
-      var clonedData = JSON.parse(JSON.stringify(this.$data));
+      //var clonedData = JSON.parse(JSON.stringify(this.$data));
 
-      this.$root.storeAsteroid(clonedData, this.asteroid);
+      var body = this.asteroid.body;
+
+      // position? rotation?
+      var bodyJSON = {
+        mass: body.mass,
+        position: toPlainArray(body.position),
+        angle: body.angle,
+        shapes: []
+      };
+
+      function toPlainArray(ta) {
+        return Array.prototype.slice.call(ta);
+      }
+
+      for (var i = 0; i < body.shapes.length; i++) {
+        var shape = body.shapes[i];
+        var shapeJSON = {
+          pos: toPlainArray(shape.position),
+          vertices: []
+        };
+
+        for (var j = 0; j < shape.vertices.length; j++) {
+          shapeJSON.vertices.push(toPlainArray(shape.vertices[j]));
+        }
+
+        bodyJSON.shapes.push(shapeJSON);
+      }
+
+      var data = {
+        geometry: this.asteroid.geometry.toJSON(),
+        material: this.asteroid.material.toJSON(),
+        body: bodyJSON
+      };
+
+      this.$root.storeAsteroid(data, this.asteroid);
       this.asteroid = null;
       this.reset();
     },

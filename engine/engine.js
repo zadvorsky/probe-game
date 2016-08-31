@@ -149,10 +149,51 @@ ENGINE.Engine.prototype.clear = function() {
 
 ENGINE.Engine.prototype.parseLevelJSON = function(json) {
   // asteroids
+  //json.asteroids.forEach(function(data) {
+  //  var asteroid = this.createAsteroid(data);
+  //  this.add(asteroid);
+  //}.bind(this));
+
+  var geometryLoader = new THREE.JSONLoader();
+  var materialLoader = new THREE.MaterialLoader();
+
   json.asteroids.forEach(function(data) {
-    var asteroid = this.createAsteroid(data);
+
+    console.log('PARSING', data);
+
+    var geometry = geometryLoader.parse(data.geometry);
+
+    console.log('PARSED geometry', geometry);
+
+    var material = materialLoader.parse(data.material);
+
+    console.log('PARSED material', material);
+
+
+    var body = new p2.Body({
+      mass: data.body.mass,
+      position: data.body.position,
+      angle: data.body.angle
+    });
+
+    for (var i = 0; i < data.body.shapes.length; i++) {
+      var shape = new p2.Convex({
+        vertices: data.body.shapes[i].vertices,
+        position: data.body.shapes[i].position
+      });
+
+      body.addShape(shape);
+    }
+
+    var asteroid = new ENGINE.GameObject(geometry, material, body);
+
+    asteroid.update();
+
     this.add(asteroid);
   }.bind(this));
+
+
+
 };
 ENGINE.Engine.prototype.createAsteroid = function(config) {
   // GEOMETRY

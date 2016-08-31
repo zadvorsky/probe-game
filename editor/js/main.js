@@ -139,7 +139,7 @@
         this.$http.post('/levels').then(function(resp) {
           console.log('loaded levels', resp.data);
           this.levels = resp.data;
-          this.loadLevel(this.levels[0]);
+          //this.loadLevel(this.levels[0]);
         });
       },
       loadLevel: function(name) {

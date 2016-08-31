@@ -108,8 +108,8 @@ ENGINE.Engine.prototype.tick = function() {
 // - paused/idle (editor default?)
 // - play
 
-ENGINE.Engine.prototype.update = function() {
-  if (this.paused === true) return;
+ENGINE.Engine.prototype.update = function(force) {
+  if (this.paused === true && force !== true) return;
 
   this.world.step(1/60);
   this.inputController.update();
@@ -271,6 +271,7 @@ ENGINE.Engine.prototype.createAsteroid = function(config) {
 
   // store data for engine reset / level replay
   asteroid.userData.defaultPosition = geometryCenter;
+  asteroid.userData.config = config;
 
   return asteroid;
 };

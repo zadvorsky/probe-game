@@ -25,3 +25,54 @@ ENGINE.GameObject.prototype.addScript = function(script, priority) {
     return a.priority < b.priority;
   })
 };
+
+Object.defineProperty(ENGINE.GameObject.prototype, 'color', {
+  get: function() {
+    return '#' + this.material.color.getHexString();
+  },
+  set: function(v) {
+    if (v.length !== 7) return;
+    this.material.color.set(v);
+  }
+});
+
+Object.defineProperty(ENGINE.GameObject.prototype, 'mass', {
+  get: function() {
+    return this.body.mass;
+  },
+  set: function(v) {
+    this.body.mass = v;
+    this.body.type = v ? p2.Body.DYNAMIC : p2.Body.STATIC;
+    this.body.updateMassProperties();
+  }
+});
+
+Object.defineProperty(ENGINE.GameObject.prototype, 'x', {
+  get: function() {
+    return this.body.position[0];
+  },
+  set: function(v) {
+    this.body.position[0] = v;
+    this.position.x = v;
+  }
+});
+
+Object.defineProperty(ENGINE.GameObject.prototype, 'y', {
+  get: function() {
+    return this.body.position[1];
+  },
+  set: function(v) {
+    this.body.position[1] = v;
+    this.position.y = v;
+  }
+});
+
+Object.defineProperty(ENGINE.GameObject.prototype, 'angle', {
+  get: function() {
+    return this.body.angle;
+  },
+  set: function(v) {
+    this.body.angle = v;
+    this.rotation.z = v;
+  }
+});

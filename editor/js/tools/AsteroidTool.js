@@ -55,7 +55,8 @@ EDITOR.AsteroidTool = Vue.extend({
       },
       extrudeDepth: 0.25,
       subdivisions: 1,
-      mass: 0
+      mass: 0,
+      angle: 0
     };
   },
 
@@ -127,7 +128,10 @@ EDITOR.AsteroidTool = Vue.extend({
     
     this.$root.engine.remove(this.drawingLine);
     this.$root.engine.remove(this.cursor);
-    
+
+    this.$root.engine.container.removeEventListener('mousemove', this.mouseMoveHandler);
+    this.$root.engine.container.removeEventListener('click', this.mouseClickHandler);
+
     cancelAnimationFrame(this.rafid);
   }
 });

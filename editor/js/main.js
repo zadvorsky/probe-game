@@ -91,13 +91,27 @@
     methods: {
       intersect: intersect,
 
-      storeAsteroid: function(data, asteroid) {
+      intersectGameObjects: function() {
+        return intersect(engine.asteroids);
+      },
 
+      storeAsteroid: function(data, asteroid) {
         console.log('store asteroid', data, asteroid);
 
+        //console.log(JSON.stringify(asteroid.toJSON()));
+
         this.level.asteroids.push(data);
-        // this.saveLevel();
       },
+
+      updateAsteroid: function(asteroid) {
+        console.log('update', asteroid.userData.config)
+      },
+      resetAsteroid: function() {
+
+      },
+
+
+
 
       createLevel: function(name) {
         this.clearLevel();
@@ -165,6 +179,9 @@
     },
     '/asteroid': {
       component: EDITOR.AsteroidTool
+    },
+    '/edit': {
+      component: EDITOR.EditTool
     }
   });
 
@@ -191,6 +208,7 @@
    // r
    if (e.keyCode === 82) {
      engine.reset();
+     engine.update(true);
    }
   });
 })();

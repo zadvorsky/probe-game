@@ -42,7 +42,7 @@ ENGINE.Probe = function() {
 
   // THRUSTERS
 
-  var thrusterPower = 1.0;
+  var thrusterPower = 2.0;
   var force = [0, 0];
 
   this.thrusterDirection = [0, 0];
@@ -52,6 +52,10 @@ ENGINE.Probe = function() {
     force[1] = this.thrusterDirection[1] * thrusterPower;
 
     this.body.applyForceLocal(force)
+  }, 1);
+
+  this.addScript(function() {
+    this.camera.position.z = 10 + p2.vec2.length(this.body.velocity) * 0.25;
   }, 1);
 };
 ENGINE.utils.extend(ENGINE.Probe, ENGINE.GameObject);

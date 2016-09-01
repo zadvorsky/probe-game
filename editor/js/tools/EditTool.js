@@ -2,14 +2,14 @@ EDITOR.EditTool = Vue.extend({
   template: `
     <div>
       <div v-if="selectedObject">
-        <div><span>x</span><input type="number" v-model="selectedObject.x"></div>
-        <div><span>y</span><input type="number" v-model="selectedObject.y"></div>
-        <div><span>angle</span><input type="number" v-model="selectedObject.angle"></div>
-        <div><span>color</span><input type="text" v-model="selectedObject.color"></div>
-        <div><span>roughness</span><input type="number" v-model="selectedObject.material.roughness"></div>
-        <div><span>metalness</span><input type="number" v-model="selectedObject.material.metalness"></div>
-        <div><span>mass</span><input type="number" v-model="selectedObject.mass"></div>
-        <div><button v-on:click="update">update</button><button v-on:click="reset">reset</button></div>
+        <div><span class="label">x</span><input type="number" v-model="selectedObject.x"></div>
+        <div><span class="label">y</span><input type="number" v-model="selectedObject.y"></div>
+        <div><span class="label">angle</span><input type="number" v-model="selectedObject.angle"></div>
+        <div><span class="label">color</span><input type="text" v-model="selectedObject.color"></div>
+        <div><span class="label">roughness</span><input type="number" v-model="selectedObject.material.roughness"></div>
+        <div><span class="label">metalness</span><input type="number" v-model="selectedObject.material.metalness"></div>
+        <div><span class="label">mass</span><input type="number" v-model="selectedObject.mass"></div>
+        <div><button v-on:click="update">update</button><button v-on:click="delete">delete</button></div>
       </div>
     </div>
   `,
@@ -19,8 +19,9 @@ EDITOR.EditTool = Vue.extend({
     update: function() {
       this.$root.updateAsteroid(this.selectedObject);
     },
-    reset: function() {
-
+    delete: function() {
+      this.$root.deleteAsteroid(this.selectedObject);
+      this.selectedObject = null;
     }
   },
   data: function() {
@@ -38,6 +39,8 @@ EDITOR.EditTool = Vue.extend({
       var intersects = this.$root.intersectGameObjects();
 
       if (intersects && intersects.length) {
+        if (this.$data.selectedObject === intersects[0].object) return;
+
         this.$data.selectedObject = intersects[0].object;
 
         this.selector.update(this.$data.selectedObject);

@@ -9,7 +9,9 @@ EDITOR.LevelsTool = Vue.extend({
         <button v-on:click="create">add</button>
       </div>
       <div>
-        <div v-for="level in levels" v-on:click="load(level)">{{ level }}</div>
+        <div v-for="level in levels">
+          <button v-on:click="load(level)">{{ level }}</button>
+        </div>
       </div>
     </div>
   `,

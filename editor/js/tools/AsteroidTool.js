@@ -1,11 +1,11 @@
 EDITOR.AsteroidTool = Vue.extend({
   template: `
     <div>
-      <div><span>extrude</span><input type="number" v-model="extrudeDepth"></div>
-      <div><span>color</span><input type="text" v-model="material.color"></div>
-      <div><span>roughness</span><input type="number" v-model="material.roughness"></div>
-      <div><span>metalness</span><input type="number" v-model="material.metalness"></div>
-      <div><span>mass</span><input type="number" v-model="mass"></div>
+      <div><span class="label">extrude</span><input type="number" v-model="extrudeDepth"></div>
+      <div><span class="label">color</span><input type="text" v-model="material.color"></div>
+      <div><span class="label">roughness</span><input type="number" v-model="material.roughness"></div>
+      <div><span class="label">metalness</span><input type="number" v-model="material.metalness"></div>
+      <div><span class="label">mass</span><input type="number" v-model="mass"></div>
       <div><button v-on:click="generate">generate</button></div>
       <div><button v-on:click="reset">reset</button></div>
       <div><button v-on:click="store">store</button></div>
@@ -22,20 +22,12 @@ EDITOR.AsteroidTool = Vue.extend({
 
     generate: function() {
       this.destroyAsteroid();
-      // asteroid.userData.defaultPosition = geometryCenter;
 
       this.asteroid = EDITOR.AsteroidFactory.create(this.$data);
       this.$root.engine.add(this.asteroid);
     },
-
     store: function() {
-      var data = {
-        geometry: this.asteroid.geometry.toJSON(),
-        material: this.asteroid.material.toJSON(),
-        body: ENGINE.utils.bodyToJSON(this.asteroid.body)
-      };
-
-      this.$root.storeAsteroid(data, this.asteroid);
+      this.$root.storeAsteroid(this.asteroid);
       this.asteroid = null;
       this.reset();
     },

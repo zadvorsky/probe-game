@@ -26,6 +26,8 @@ ENGINE.GameObject.prototype.addScript = function(script, priority) {
   })
 };
 
+// todo move these to a EngineGameObjectAdapter?
+
 Object.defineProperty(ENGINE.GameObject.prototype, 'color', {
   get: function() {
     return '#' + this.material.color.getHexString();
@@ -38,7 +40,7 @@ Object.defineProperty(ENGINE.GameObject.prototype, 'color', {
 
 Object.defineProperty(ENGINE.GameObject.prototype, 'mass', {
   get: function() {
-    return this.body.mass;
+    return (this.body.type === p2.Body.DYNAMIC ? this.body.mass : 0);
   },
   set: function(v) {
     this.body.mass = v;

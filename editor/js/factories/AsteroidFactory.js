@@ -78,5 +78,13 @@ EDITOR.AsteroidFactory = {
     asteroid.update();
     
     return asteroid;
+  },
+
+  toJSON: function(asteroid) {
+    return {
+      geometry: asteroid.geometry.toJSON(),
+      material: asteroid.material.toJSON(),
+      body: ENGINE.utils.bodyToJSON(asteroid.body)
+    };
   }
 };

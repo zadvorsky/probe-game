@@ -33,9 +33,6 @@ ENGINE.utils = {
     return bodyJSON;
   },
   bodyFromJSON: function(data) {
-    
-    console.log('angle', data.angle);
-    
     var body = new p2.Body({
       mass: data.mass,
       position: data.position,

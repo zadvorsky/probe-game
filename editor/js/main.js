@@ -92,28 +92,25 @@
   var App = Vue.extend({
     methods: {
       intersect: intersect,
-
       intersectGameObjects: function() {
         return intersect(engine.asteroids);
       },
 
-      storeAsteroid: function(data, asteroid) {
-        console.log('store asteroid', data, asteroid);
-
-        //console.log(JSON.stringify(asteroid.toJSON()));
-
-        this.level.asteroids.push(data);
+      storeAsteroid: function(asteroid) {
+        engine.asteroids.push(asteroid);
+        this.level.asteroids.push(EDITOR.AsteroidFactory.toJSON(asteroid));
       },
-
       updateAsteroid: function(asteroid) {
-        console.log('update', asteroid.userData.config)
+        var index = engine.asteroids.indexOf(asteroid);
+        this.level.asteroids[index] = EDITOR.AsteroidFactory.toJSON(asteroid);
       },
-      resetAsteroid: function() {
+      deleteAsteroid: function(asteroid) {
+        var index = engine.asteroids.indexOf(asteroid);
 
+        this.level.asteroids.splice(index, 1);
+        engine.asteroids.splice(index, 1);
+        engine.remove(asteroid);
       },
-
-
-
 
       createLevel: function(name) {
         this.clearLevel();

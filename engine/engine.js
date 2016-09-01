@@ -16,8 +16,6 @@ ENGINE.Engine = function(container) {
   // scene
   this.scene = new THREE.Scene();
 
-  window.scene = this.scene;
-
   // camera
   this.cameras = {};
   this.registerCamera('game', new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.1, 10000));
@@ -34,11 +32,20 @@ ENGINE.Engine = function(container) {
   });
   // todo init global materials, groups
 
+  // lights
+  this.directionalLight1 = new THREE.DirectionalLight(0xffffff, 0.125);
+  this.directionalLight1.position.set(0, 0, 1);
+  this.scene.add(this.directionalLight1);
+
   // objects
   this.initProbe();
 
   this.asteroids = [];
-  
+
+  // loaders
+  this.geometryLoader = new THREE.JSONLoader();
+  this.materialLoader = new THREE.MaterialLoader();
+
   // tick/update/render
   this.paused = false;
 
@@ -62,41 +69,6 @@ ENGINE.Engine.prototype.initRenderer = function() {
   this.container.appendChild(this.renderer.domElement);
 };
 
-ENGINE.Engine.prototype.initProbe = function() {
-  this.probe = new ENGINE.Probe();
-  this.add(this.probe);
-
-  this.probe.setCamera(this.cameras['game']);
-
-  this.inputController = new ENGINE.InputController(this.probe);
-};
-
-ENGINE.Engine.prototype.reset = function() {
-  this.probe.reset();
-
-  this.asteroids.forEach(function(a) {
-    a.body.velocity[0] = 0;
-    a.body.velocity[1] = 0;
-    a.body.position[0] = a.userData.defaultPosition.x;
-    a.body.position[1] = a.userData.defaultPosition.y;
-    a.body.angle = 0;
-    a.body.angularVelocity = 0;
-  });
-};
-
-ENGINE.Engine.prototype.resize = function() {
-  var width = window.innerWidth;
-  var height = window.innerHeight;
-
-  for (var key in this.cameras) {
-    var camera = this.cameras[key];
-    camera.aspect = width / height;
-    camera.updateProjectionMatrix();
-  }
-
-  this.renderer.setSize(width, height);
-};
-
 ENGINE.Engine.prototype.tick = function() {
   this.update();
   this.render();
@@ -115,12 +87,34 @@ ENGINE.Engine.prototype.update = function(force) {
   this.inputController.update();
 
   this.scene.traverse(function(child) {
-    child.update && child.update();
+    (child.update && child.update.length == 0) && child.update();
   });
 };
 
 ENGINE.Engine.prototype.render = function() {
   this.renderer.render(this.scene, this.activeCamera);
+};
+
+ENGINE.Engine.prototype.resize = function() {
+  var width = window.innerWidth;
+  var height = window.innerHeight;
+
+  for (var key in this.cameras) {
+    var camera = this.cameras[key];
+    camera.aspect = width / height;
+    camera.updateProjectionMatrix();
+  }
+
+  this.renderer.setSize(width, height);
+};
+
+ENGINE.Engine.prototype.initProbe = function() {
+  this.probe = new ENGINE.Probe();
+  this.add(this.probe);
+
+  this.probe.setCamera(this.cameras['game']);
+
+  this.inputController = new ENGINE.InputController(this.probe);
 };
 
 ENGINE.Engine.prototype.registerCamera = function(key, camera) {
@@ -147,22 +141,30 @@ ENGINE.Engine.prototype.clear = function() {
   this.asteroids.length = 0;
 };
 
+ENGINE.Engine.prototype.reset = function() {
+  this.probe.reset();
+  this.clear();
+
+  this.currentLevelJSON && this.parseLevelJSON(this.currentLevelJSON);
+};
+
 ENGINE.Engine.prototype.parseLevelJSON = function(json) {
-  var geometryLoader = new THREE.JSONLoader();
-  var materialLoader = new THREE.MaterialLoader();
+  this.currentLevelJSON = json;
 
   json.asteroids.forEach(function(data) {
-    var geometry = geometryLoader.parse(data.geometry.data).geometry;
-    var material = materialLoader.parse(data.material);
-    var body = ENGINE.utils.bodyFromJSON(data.body);
-    var asteroid = new ENGINE.GameObject(geometry, material, body);
-
-    asteroid.update();
-    
-    this.asteroids.push(asteroid);
-    this.add(asteroid);
+    this.createAsteroid(data);
   }.bind(this));
 };
-ENGINE.Engine.prototype.createAsteroid = function(config) {
+ENGINE.Engine.prototype.createAsteroid = function(data) {
+  var geometry = this.geometryLoader.parse(data.geometry.data).geometry;
+  var material = this.materialLoader.parse(data.material);
+  var body = ENGINE.utils.bodyFromJSON(data.body);
+  var asteroid = new ENGINE.GameObject(geometry, material, body);
 
+  asteroid.castShadow = true;
+  asteroid.receiveShadow = true;
+  asteroid.update();
+
+  this.asteroids.push(asteroid);
+  this.add(asteroid);
 };

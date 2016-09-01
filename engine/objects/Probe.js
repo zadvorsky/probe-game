@@ -2,8 +2,15 @@ ENGINE.Probe = function() {
 
   // THREE
 
-  var geometry = new THREE.SphereGeometry(1.0, 16, 16);
-  var material = new THREE.MeshBasicMaterial({color: 0xffffff, wireframe: true});
+  var geometry = new THREE.SphereGeometry(1.0, 12, 12);
+  geometry.rotateX(Math.PI * 0.5);
+  //var geometry = new THREE.DodecahedronGeometry(1.0);
+  //var material = new THREE.MeshBasicMaterial({color: 0xffffff, wireframe: true});
+  var material = new THREE.MeshStandardMaterial({
+    color: 0xffffff,
+    metalness: 0.0,
+    shading: THREE.FlatShading,
+  });
 
   // PHYSICS
 

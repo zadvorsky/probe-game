@@ -9,8 +9,10 @@
 //=require ../../bower_components/vue-resource/dist/vue-resource.js
 
 //=require init.js
+//=require utils.js
 //=require objects/*.js
 //=require tools/*.js
+//=require factories/*.js
 
 (function() {
   ////////////////////////////
@@ -136,10 +138,9 @@
         this.level.asteroids && (this.level.asteroids.length = 0);
       },
       loadLevels: function() {
-        this.$http.post('/levels').then(function(resp) {
+        return this.$http.post('/levels').then(function(resp) {
           console.log('loaded levels', resp.data);
           this.levels = resp.data;
-          //this.loadLevel(this.levels[0]);
         });
       },
       loadLevel: function(name) {
@@ -186,7 +187,9 @@
   });
 
   router.start(App, '#app');
-  router.app.loadLevels();
+  router.app.loadLevels().then(function() {
+    this.loadLevel(this.levels[0]);
+  });
   
   // todo key to command map
   window.addEventListener('keyup', function(e) {

@@ -50,7 +50,7 @@ app.post('/loadConfig', function(req, res) {
 app.post('/saveConfig', function(req, res) {
   var fileName = path.join(__dirname + '/engine/config.json');
 
-  jsonfile.writeFile(fileName, req.body, function(error) {
+  jsonfile.writeFile(fileName, req.body, {spaces: 2}, function(error) {
     if (error) console.log('/saveConfig error', error);
     else res.send('config saved');
   });

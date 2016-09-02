@@ -187,10 +187,8 @@
   request.open('POST', 'http://localhost:3000/loadConfig', true);
   request.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
   request.onload = function(e) {
-
-    console.log('load', e.target.response);
-
-    Object.assign(ENGINE.config, JSON.parse(e.target.response));
+    //Object.assign(ENGINE.config, JSON.parse(e.target.response));
+    ENGINE.config = JSON.parse(e.target.response);
 
     console.log('CONFIG', ENGINE.config);
 

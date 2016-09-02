@@ -1,1 +1,5 @@
-{"probe":{"thrusterPower":"6"}}
+{
+  "probe": {
+    "thrusterPower": "2"
+  }
+}

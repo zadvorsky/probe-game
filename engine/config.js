@@ -1,5 +1,1 @@
-ENGINE.config = {
-  probe: {
-    thrusterPower: 2.0
-  }
-};
+ENGINE.config = {};

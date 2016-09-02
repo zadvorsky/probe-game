@@ -15,101 +15,94 @@
 //=require factories/*.js
 
 (function() {
-  ////////////////////////////
-  // global/engine objects
-  ////////////////////////////
-
-  // containers
-  var engineContainer = document.querySelector('#three-container');
-  var uiContainer = document.querySelector('#ui-container');
-
-  // engine
-  var engine = new ENGINE.Engine(engineContainer);
-  engine.paused = true;
-
-  // camera & camera controls
-  var camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.1, 100000);
-  camera.position.z = 20;
-  var controls = new THREE.OrbitControls(camera, engineContainer);
-  controls.keys = false;
-  controls.enableRotate = false;
-  engine.registerCamera('editor', camera);
-  engine.activateCamera('editor');
-
-  // lights?
-  //var light = new THREE.DirectionalLight(0xffffff, 0.25);
-  //light.position.set(0, 0, 1);
-  //engine.add(light);
-
-  // grid / editing pane
-  var gridSize = 100;
-  var gridSegments = 400;
-  var gridStep = gridSize * 2 / gridSegments;
-
-  var editorZPlane = new THREE.Mesh(
-    new THREE.PlaneBufferGeometry(gridSize * 2, gridSize * 2),
-    new THREE.MeshBasicMaterial({
-      visible: false
-    })
-  );
-  editorZPlane.stepSize = gridStep;
-
-  var grid = new THREE.GridHelper(gridSize, gridSegments, 0x444444, 0x444444);
-  grid.rotation.x = Math.PI * 0.5;
-  editorZPlane.add(grid);
-
-  engine.add(editorZPlane);
-  
-  ////////////////////////////
-  // mouse handling
-  ////////////////////////////
-  
-  var mouseNDC = new THREE.Vector2();
-  var raycaster = new THREE.Raycaster();
-  
-  engineContainer.addEventListener('mousemove', function(e) {
-    mouseNDC.set((e.clientX / window.innerWidth) * 2 - 1, -(e.clientY / window.innerHeight) * 2 + 1);
-  });
-  
-  function intersect(objects) {
-    raycaster.setFromCamera(mouseNDC, camera);
-    
-    if (Array.isArray(objects)) {
-      return raycaster.intersectObjects(objects);
-    }
-    else {
-      return raycaster.intersectObject(objects);
-    }
-  }
-  
-  ////////////////////////////
-  // vue.js setup
-  ////////////////////////////
-
   Vue.use(VueRouter);
   Vue.use(VueResource);
 
   var App = Vue.extend({
+    created: function() {
+      // containers
+      var engineContainer = document.querySelector('#three-container');
+      var uiContainer = document.querySelector('#ui-container');
+
+      // engine
+      this.engine = new ENGINE.Engine(engineContainer);
+      this.engine.paused = true;
+
+      // camera & camera controls
+      this.camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.1, 100000);
+      this.camera.position.z = 20;
+      this.controls = new THREE.OrbitControls(this.camera, engineContainer);
+      this.controls.keys = false;
+      this.controls.enableRotate = false;
+      this.engine.registerCamera('editor', this.camera);
+      this.engine.activateCamera('editor');
+
+      // grid / editing pane
+      this.zPlane = new EDITOR.ZPlane(100, 0.25);
+      this.engine.add(this.zPlane);
+
+      // mouse handling
+      this.mouseNDC = new THREE.Vector2();
+      this.raycaster = new THREE.Raycaster();
+
+      engineContainer.addEventListener('mousemove', function(e) {
+        this.mouseNDC.set((e.clientX / window.innerWidth) * 2 - 1, -(e.clientY / window.innerHeight) * 2 + 1);
+      }.bind(this));
+
+      // key handling
+      window.addEventListener('keyup', function(e) {
+        // p
+        if (e.keyCode === 80) {
+          this.engine.paused = !this.engine.paused;
+
+          if (this.engine.paused) {
+            uiContainer.style.display = 'block';
+            this.zPlane.visible = true;
+            this.engine.activateCamera('editor');
+          }
+          else {
+            uiContainer.style.display = 'none';
+            this.zPlane.visible = false;
+            this.engine.activateCamera('game');
+          }
+        }
+        // r
+        if (e.keyCode === 82) {
+          this.engine.reset();
+          this.engine.update(true);
+        }
+      }.bind(this));
+    },
+
     methods: {
-      intersect: intersect,
+      intersect: function(objects) {
+        this.raycaster.setFromCamera(this.mouseNDC, this.camera);
+
+        if (Array.isArray(objects)) {
+          return this.raycaster.intersectObjects(objects);
+        }
+        else {
+          return this.raycaster.intersectObject(objects);
+        }
+      },
       intersectGameObjects: function() {
-        return intersect(engine.asteroids);
+        return this.intersect(this.engine.asteroids);
       },
 
       storeAsteroid: function(asteroid) {
-        engine.asteroids.push(asteroid);
+        this.engine.asteroids.push(asteroid);
         this.level.asteroids.push(EDITOR.AsteroidFactory.toJSON(asteroid));
       },
       updateAsteroid: function(asteroid) {
-        var index = engine.asteroids.indexOf(asteroid);
+        var index = this.engine.asteroids.indexOf(asteroid);
         this.level.asteroids[index] = EDITOR.AsteroidFactory.toJSON(asteroid);
       },
       deleteAsteroid: function(asteroid) {
-        var index = engine.asteroids.indexOf(asteroid);
+        var index = this.engine.asteroids.indexOf(asteroid);
 
         this.level.asteroids.splice(index, 1);
-        engine.asteroids.splice(index, 1);
-        engine.remove(asteroid);
+        this.engine.asteroids.splice(index, 1);
+        this.engine.remove(asteroid);
       },
 
       createLevel: function(name) {
@@ -125,13 +118,12 @@
       saveLevel: function() {
         this.$http.post('/save', this.level).then(function(resp) {
           console.log('saved level ' + this.level.name);
-          
           // maybe? or return the list of file names in node
           this.loadLevels();
         });
       },
       clearLevel: function() {
-        engine.clear();
+        this.engine.clear();
         this.level.asteroids && (this.level.asteroids.length = 0);
       },
       loadLevels: function() {
@@ -145,20 +137,19 @@
   
         // note to self: name is INC extension here, without extension is create and save
         this.$http.post('/load', {name:name}).then(function(resp) {
-          console.log('loaded level ' + name, resp.data);
+          console.log('loaded level ' + name);
           this.level = resp.data;
-
-          engine.parseLevelJSON(this.level);
+          this.engine.parseLevelJSON(this.level);
         });
       }
     },
     
     data: function() {
       return {
-        engine: engine,
-        camera: camera,
-        controls: controls,
-        zPlane: editorZPlane,
+        engine: null,
+        camera: null,
+        controls: null,
+        zPlane: null,
   
         levels: [],
         level: {}
@@ -186,29 +177,5 @@
   router.start(App, '#app');
   router.app.loadLevels().then(function() {
     this.loadLevel(this.levels[0]);
-  });
-  
-  // todo key to command map
-  window.addEventListener('keyup', function(e) {
-   // p
-   if (e.keyCode === 80) {
-     engine.paused = !engine.paused;
-
-     if (engine.paused) {
-       uiContainer.style.display = 'block';
-       editorZPlane.visible = true;
-       engine.activateCamera('editor');
-     }
-     else {
-       uiContainer.style.display = 'none';
-       editorZPlane.visible = false;
-       engine.activateCamera('game');
-     }
-   }
-   // r
-   if (e.keyCode === 82) {
-     engine.reset();
-     engine.update(true);
-   }
   });
 })();

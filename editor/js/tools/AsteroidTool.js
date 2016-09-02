@@ -61,8 +61,7 @@ EDITOR.AsteroidTool = Vue.extend({
   ready: function() {
     var engine = this.$root.engine;
     var plane = this.$root.zPlane;
-    var gridStep = this.$root.zPlane.stepSize;
-    
+
     this.cursor = new EDITOR.Cursor(0.2);
     engine.add(this.cursor);
     
@@ -108,9 +107,11 @@ EDITOR.AsteroidTool = Vue.extend({
 
       if (intersects && intersects.length) {
         var p = intersects[0].point;
-        var x = Math.round(p.x / gridStep) * gridStep;
-        var y = Math.round(p.y / gridStep) * gridStep;
-        this.cursor.position.set(x, y, p.z);
+
+        // if snapping
+        plane.snapPoint(p);
+
+        this.cursor.position.copy(p);
       }
 
       this.rafid = requestAnimationFrame(update);

@@ -116,7 +116,7 @@
         this.saveLevel();
       },
       saveLevel: function() {
-        this.$http.post('/save', this.level).then(function(resp) {
+        return this.$http.post('/save', this.level).then(function(resp) {
           console.log('saved level ' + this.level.name);
           // maybe? or return the list of file names in node
           this.loadLevels();
@@ -136,10 +136,16 @@
         this.clearLevel();
   
         // note to self: name is INC extension here, without extension is create and save
-        this.$http.post('/load', {name:name}).then(function(resp) {
+        return this.$http.post('/load', {name:name}).then(function(resp) {
           console.log('loaded level ' + name);
           this.level = resp.data;
           this.engine.parseLevelJSON(this.level);
+        });
+      },
+
+      saveConfig: function() {
+        return this.$http.post('/saveConfig', ENGINE.config).then(function(resp) {
+          console.log('saved config');
         });
       }
     },
@@ -166,6 +172,9 @@
     '/camera': {
       component: EDITOR.CameraTool
     },
+    '/probe': {
+      component: EDITOR.ProbeTool
+    },
     '/asteroid': {
       component: EDITOR.AsteroidTool
     },
@@ -174,8 +183,21 @@
     }
   });
 
-  router.start(App, '#app');
-  router.app.loadLevels().then(function() {
-    this.loadLevel(this.levels[0]);
-  });
+  var request = new XMLHttpRequest();
+  request.open('POST', 'http://localhost:3000/loadConfig', true);
+  request.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+  request.onload = function(e) {
+
+    console.log('load', e.target.response);
+
+    Object.assign(ENGINE.config, JSON.parse(e.target.response));
+
+    console.log('CONFIG', ENGINE.config);
+
+    router.start(App, '#app');
+    router.app.loadLevels().then(function() {
+      this.loadLevel(this.levels[0]);
+    });
+  };
+  request.send();
 })();

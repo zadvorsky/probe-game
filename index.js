@@ -43,6 +43,20 @@ app.post('/save', function(req, res) {
   });
 });
 
+app.post('/loadConfig', function(req, res) {
+  res.sendFile(path.join(__dirname + '/engine/config.json'));
+});
+
+app.post('/saveConfig', function(req, res) {
+  var fileName = path.join(__dirname + '/engine/config.json');
+
+  jsonfile.writeFile(fileName, req.body, function(error) {
+    if (error) console.log('/saveConfig error', error);
+    else res.send('config saved');
+  });
+});
+
+
 // do we need this?
 //app.post('/delete', function(req, res) {
 //  fs.unlink(path.join(LEVELS_DIR + req.body.name), function(error) {

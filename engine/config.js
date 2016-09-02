@@ -1,3 +1,5 @@
-ENGINE.Config = {
-
+ENGINE.config = {
+  probe: {
+    thrusterPower: 2.0
+  }
 };

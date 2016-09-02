@@ -9,7 +9,7 @@ ENGINE.Probe = function() {
   var material = new THREE.MeshStandardMaterial({
     color: 0xffffff,
     metalness: 0.0,
-    shading: THREE.FlatShading,
+    shading: THREE.FlatShading
   });
 
   // PHYSICS
@@ -42,14 +42,13 @@ ENGINE.Probe = function() {
 
   // THRUSTERS
 
-  var thrusterPower = 2.0;
-  var force = [0, 0];
-
   this.thrusterDirection = [0, 0];
 
+  var force = [0, 0];
+
   this.addScript(function() {
-    force[0] = this.thrusterDirection[0] * thrusterPower;
-    force[1] = this.thrusterDirection[1] * thrusterPower;
+    force[0] = this.thrusterDirection[0] * ENGINE.config.probe.thrusterPower;
+    force[1] = this.thrusterDirection[1] * ENGINE.config.probe.thrusterPower;
 
     this.body.applyForceLocal(force)
   }, 1);

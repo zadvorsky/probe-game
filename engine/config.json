@@ -1,5 +1,8 @@
 {
   "probe": {
-    "thrusterPower": "2"
+    "thrusterPower": 2,
+    "cameraDistanceDefault": 10,
+    "cameraDistanceSpeedFactor": 0.25,
+    "angularDamping": 0.25
   }
 }

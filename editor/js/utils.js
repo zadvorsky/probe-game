@@ -22,5 +22,15 @@ EDITOR.utils = {
         })
       ));
     }
+  },
+
+  copy: function(target, source) {
+    var keys = Object.keys(target);
+
+    keys.forEach(function(k) {
+      target[k] = source[k];
+    });
+
+    return target;
   }
 };

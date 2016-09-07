@@ -63,10 +63,10 @@ EDITOR.AsteroidTool = Vue.extend({
     var plane = this.$root.zPlane;
 
     this.cursor = new EDITOR.Cursor(0.2);
-    engine.add(this.cursor);
+    engine.add(this.cursor, false);
     
     this.drawingLine = new EDITOR.DrawingLine(this.points);
-    engine.add(this.drawingLine);
+    engine.add(this.drawingLine, false);
 
     engine.container.style.cursor = 'crosshair';
     

@@ -110,7 +110,7 @@ ENGINE.Engine.prototype.resize = function() {
 
 ENGINE.Engine.prototype.initProbe = function() {
   this.probe = new ENGINE.Probe();
-  this.add(this.probe);
+  this.add(this.probe, false);
 
   this.probe.setCamera(this.cameras['game']);
 
@@ -124,19 +124,26 @@ ENGINE.Engine.prototype.activateCamera = function(key) {
   this.activeCamera = this.cameras[key];
 };
 
-ENGINE.Engine.prototype.add = function(object) {
+// todo find better way to handle gameObjects array
+ENGINE.Engine.prototype.add = function(object, addToGameObjects) {
   this.scene.add(object);
   object.body && this.world.addBody(object.body);
+  (addToGameObjects !== false) && this.gameObjects.push(object);
 };
-ENGINE.Engine.prototype.remove = function(object) {
+ENGINE.Engine.prototype.remove = function(object, removeFromGameObjects) {
   this.scene.remove(object);
   object.body && this.world.removeBody(object.body);
+
+  if (removeFromGameObjects !== false) {
+    var index = this.gameObjects.indexOf(object);
+    console.log('remove from engine', index);
+    if (index !== -1) this.gameObjects.splice(index, 1);
+  }
 };
 
 ENGINE.Engine.prototype.clear = function() {
-  // asteroids
   this.gameObjects.forEach(function(a) {
-    this.remove(a);
+    this.remove(a, false);
   }.bind(this));
   this.gameObjects.length = 0;
 };
@@ -151,13 +158,18 @@ ENGINE.Engine.prototype.reset = function() {
 ENGINE.Engine.prototype.parseLevelJSON = function(json) {
   this.currentLevelJSON = json;
 
-  json.asteroids.forEach(function(data) {
-    this.createAsteroid(data);
+  json.objects.forEach(function(obj) {
+    switch (obj.type) {
+      case 'asteroid':
+        this.createAsteroid(obj);
+        break;
+      case 'beacon':
+        this.createBeacon(obj);
+        break;
+    }
   }.bind(this));
 
-  json.beacons && json.beacons.forEach(function(data) {
-    this.createBeacon(data);
-  });
+
 };
 ENGINE.Engine.prototype.createAsteroid = function(data) {
   var geometry = this.geometryLoader.parse(data.geometry.data).geometry;
@@ -165,25 +177,11 @@ ENGINE.Engine.prototype.createAsteroid = function(data) {
   var body = ENGINE.utils.bodyFromJSON(data.body);
   var asteroid = new ENGINE.Asteroid(geometry, material, body);
 
-  asteroid.update();
-
-  this.gameObjects.push(asteroid);
   this.add(asteroid);
 };
 
 ENGINE.Engine.prototype.createBeacon = function(data) {
+  var beacon = new ENGINE.Beacon(data.position);
 
-  var breacon = new ENGINE.Beacon(data.position);
-
-  //var geometry = this.geometryLoader.parse(data.geometry.data).geometry;
-  //var material = this.materialLoader.parse(data.material);
-  //var body = ENGINE.utils.bodyFromJSON(data.body);
-  //var asteroid = new ENGINE.GameObject(geometry, material, body);
-  //
-  //asteroid.castShadow = true;
-  //asteroid.receiveShadow = true;
-  //asteroid.update();
-  //
-  //this.asteroids.push(asteroid);
-  //this.add(asteroid);
+  this.add(beacon);
 };

@@ -39,7 +39,7 @@
 
       // grid / editing pane
       this.zPlane = new EDITOR.ZPlane(100, 0.25);
-      this.engine.add(this.zPlane);
+      this.engine.add(this.zPlane, false);
 
       // mouse handling
       this.mouseNDC = new THREE.Vector2();
@@ -90,28 +90,32 @@
       },
 
       storeBeacon: function(beacon) {
-
-        console.log('STORE BEACON', beacon);
-
         this.engine.add(beacon);
-        this.engine.gameObjects.push(beacon);
+        //this.engine.gameObjects.push(beacon);
+
+        this.level.objects.push(beacon.toJSON());
       },
 
       storeAsteroid: function(asteroid) {
-        this.engine.gameObjects.push(asteroid);
-        this.level.asteroids.push(EDITOR.AsteroidFactory.toJSON(asteroid));
+        //this.engine.gameObjects.push(asteroid);
+        this.level.objects.push(EDITOR.AsteroidFactory.toJSON(asteroid));
       },
+
       updateAsteroid: function(asteroid) {
         var index = this.engine.gameObjects.indexOf(asteroid);
-        this.level.asteroids[index] = EDITOR.AsteroidFactory.toJSON(asteroid);
+        this.level.objects[index] = EDITOR.AsteroidFactory.toJSON(asteroid);
       },
       deleteAsteroid: function(asteroid) {
+
+
         var index = this.engine.gameObjects.indexOf(asteroid);
 
-        // todo fix for other object types
-        this.level.asteroids.splice(index, 1);
-        this.engine.gameObjects.splice(index, 1);
+        console.log('delete', index);
+
+
+        this.level.objects.splice(index, 1);
         this.engine.remove(asteroid);
+        //this.engine.gameObjects.splice(index, 1);
       },
 
       createLevel: function(name) {
@@ -119,8 +123,7 @@
 
         this.level = {
           name: name,
-          asteroids: [],
-          beacons: []
+          objects: []
         };
 
         this.saveLevel();
@@ -134,7 +137,7 @@
       },
       clearLevel: function() {
         this.engine.clear();
-        this.level.asteroids && (this.level.asteroids.length = 0);
+        this.level.objects && (this.level.objects.length = 0);
       },
       loadLevels: function() {
         return this.$http.post('/levels').then(function(resp) {

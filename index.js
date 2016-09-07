@@ -37,7 +37,7 @@ app.post('/save', function(req, res) {
   var levelData = data;
   var fileName = path.join(LEVELS_DIR + levelName + '.json');
   
-  jsonfile.writeFile(fileName, levelData, function(error) {
+  jsonfile.writeFile(fileName, levelData, {spaces: 2}, function(error) {
     if (error) console.log('/save error', error);
     else res.send('level saved');
   });

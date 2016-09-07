@@ -1,5 +1,5 @@
 EDITOR.BeaconTool = Vue.extend({
-  template: '<button v-on:click="reset">reset</button>',
+  template: '<div></div>',
 
   methods: {
     reset: function () {
@@ -11,7 +11,7 @@ EDITOR.BeaconTool = Vue.extend({
     var plane = this.$root.zPlane;
 
     this.cursor = new EDITOR.Cursor(0.2);
-    engine.add(this.cursor);
+    engine.add(this.cursor, false);
 
     engine.container.style.cursor = 'crosshair';
 
@@ -45,5 +45,11 @@ EDITOR.BeaconTool = Vue.extend({
     update();
   },
   beforeDestroy: function() {
+    this.$root.engine.container.style.cursor = '';
+
+    this.$root.engine.remove(this.cursor);
+    this.$root.engine.container.removeEventListener('click', this.mouseClickHandler);
+
+    cancelAnimationFrame(this.rafid);
   }
 });

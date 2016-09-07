@@ -16,6 +16,15 @@ ENGINE.Beacon = function(position) {
 };
 ENGINE.utils.extend(ENGINE.Beacon, ENGINE.GameObject);
 
+ENGINE.Beacon.prototype.toJSON = function() {
+  return {
+    type: 'beacon',
+    position: this.position
+  }
+};
+
+// STATIC
+
 ENGINE.Beacon.material = new THREE.MeshBasicMaterial({
   color: 0x00ff00
 });

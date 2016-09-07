@@ -11,6 +11,8 @@ ENGINE.GameObject = function(geometry, material, body, type) {
     this.position.y = this.body.position[1];
     this.rotation.z = this.body.angle;
   });
+
+  this.update();
 };
 ENGINE.utils.extend(ENGINE.GameObject, THREE.Mesh);
 

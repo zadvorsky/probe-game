@@ -86,22 +86,31 @@
         }
       },
       intersectGameObjects: function() {
-        return this.intersect(this.engine.asteroids);
+        return this.intersect(this.engine.gameObjects);
+      },
+
+      storeBeacon: function(beacon) {
+
+        console.log('STORE BEACON', beacon);
+
+        this.engine.add(beacon);
+        this.engine.gameObjects.push(beacon);
       },
 
       storeAsteroid: function(asteroid) {
-        this.engine.asteroids.push(asteroid);
+        this.engine.gameObjects.push(asteroid);
         this.level.asteroids.push(EDITOR.AsteroidFactory.toJSON(asteroid));
       },
       updateAsteroid: function(asteroid) {
-        var index = this.engine.asteroids.indexOf(asteroid);
+        var index = this.engine.gameObjects.indexOf(asteroid);
         this.level.asteroids[index] = EDITOR.AsteroidFactory.toJSON(asteroid);
       },
       deleteAsteroid: function(asteroid) {
-        var index = this.engine.asteroids.indexOf(asteroid);
+        var index = this.engine.gameObjects.indexOf(asteroid);
 
+        // todo fix for other object types
         this.level.asteroids.splice(index, 1);
-        this.engine.asteroids.splice(index, 1);
+        this.engine.gameObjects.splice(index, 1);
         this.engine.remove(asteroid);
       },
 
@@ -110,7 +119,8 @@
 
         this.level = {
           name: name,
-          asteroids: []
+          asteroids: [],
+          beacons: []
         };
 
         this.saveLevel();
@@ -166,21 +176,12 @@
   var router = new VueRouter();
 
   router.map({
-    '/level': {
-      component: EDITOR.LevelsTool
-    },
-    '/camera': {
-      component: EDITOR.CameraTool
-    },
-    '/probe': {
-      component: EDITOR.ProbeTool
-    },
-    '/asteroid': {
-      component: EDITOR.AsteroidTool
-    },
-    '/edit': {
-      component: EDITOR.EditTool
-    }
+    '/level': {component: EDITOR.LevelsTool},
+    '/camera': {component: EDITOR.CameraTool},
+    '/probe': {component: EDITOR.ProbeTool},
+    '/asteroid': {component: EDITOR.AsteroidTool},
+    '/beacon': {component: EDITOR.BeaconTool},
+    '/edit': {component: EDITOR.EditTool}
   });
 
   var request = new XMLHttpRequest();

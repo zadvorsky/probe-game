@@ -1,8 +1,10 @@
-ENGINE.GameObject = function(geometry, material, body) {
+ENGINE.GameObject = function(geometry, material, body, type) {
   THREE.Mesh.call(this, geometry, material);
 
   this.body = body;
+  this.body.userData = {};
   this.scripts = [];
+  this.engineType = type;
 
   this.addScript(function() {
     this.position.x = this.body.position[0];
@@ -25,6 +27,15 @@ ENGINE.GameObject.prototype.addScript = function(script, priority) {
     return a.priority < b.priority;
   })
 };
+
+Object.defineProperty(ENGINE.GameObject.prototype, 'engineType', {
+  get: function() {
+    return this.body.userData.type;
+  },
+  set: function(v) {
+    this.body.userData.type = v;
+  }
+});
 
 // todo move these to a EngineGameObjectAdapter?
 

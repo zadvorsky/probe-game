@@ -15,7 +15,7 @@ ENGINE.Probe = function() {
   var body = new p2.Body({mass: 1.0});
   body.addShape(shape);
 
-  ENGINE.GameObject.call(this, geometry, material, body);
+  ENGINE.GameObject.call(this, geometry, material, body, 'probe');
 
   // config
   this.thrusterPower = ENGINE.config.probe.thrusterPower;

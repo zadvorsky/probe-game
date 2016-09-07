@@ -57,10 +57,8 @@ EDITOR.AsteroidFactory = {
   
     // ASTEROID
   
-    var asteroid = new ENGINE.GameObject(geometry, material, body);
+    var asteroid = new ENGINE.Asteroid(geometry, material, body);
     asteroid.position.copy(geometryCenter);
-    asteroid.castShadow = true;
-    asteroid.receiveShadow = true;
   
     // adjust asteroid geometry to match with the p2 body
     // TODO figure out why geometry and body do not match

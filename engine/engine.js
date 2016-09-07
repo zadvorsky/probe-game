@@ -39,8 +39,7 @@ ENGINE.Engine = function(container) {
 
   // objects
   this.initProbe();
-
-  this.asteroids = [];
+  this.gameObjects = [];
 
   // loaders
   this.geometryLoader = new THREE.JSONLoader();
@@ -87,6 +86,7 @@ ENGINE.Engine.prototype.update = function(force) {
   this.inputController.update();
 
   this.scene.traverse(function(child) {
+    // todo remove update.length check
     (child.update && child.update.length == 0) && child.update();
   });
 };
@@ -135,10 +135,10 @@ ENGINE.Engine.prototype.remove = function(object) {
 
 ENGINE.Engine.prototype.clear = function() {
   // asteroids
-  this.asteroids.forEach(function(a) {
+  this.gameObjects.forEach(function(a) {
     this.remove(a);
   }.bind(this));
-  this.asteroids.length = 0;
+  this.gameObjects.length = 0;
 };
 
 ENGINE.Engine.prototype.reset = function() {
@@ -154,17 +154,36 @@ ENGINE.Engine.prototype.parseLevelJSON = function(json) {
   json.asteroids.forEach(function(data) {
     this.createAsteroid(data);
   }.bind(this));
+
+  json.beacons && json.beacons.forEach(function(data) {
+    this.createBeacon(data);
+  });
 };
 ENGINE.Engine.prototype.createAsteroid = function(data) {
   var geometry = this.geometryLoader.parse(data.geometry.data).geometry;
   var material = this.materialLoader.parse(data.material);
   var body = ENGINE.utils.bodyFromJSON(data.body);
-  var asteroid = new ENGINE.GameObject(geometry, material, body);
+  var asteroid = new ENGINE.Asteroid(geometry, material, body);
 
-  asteroid.castShadow = true;
-  asteroid.receiveShadow = true;
   asteroid.update();
 
-  this.asteroids.push(asteroid);
+  this.gameObjects.push(asteroid);
   this.add(asteroid);
+};
+
+ENGINE.Engine.prototype.createBeacon = function(data) {
+
+  var breacon = new ENGINE.Beacon(data.position);
+
+  //var geometry = this.geometryLoader.parse(data.geometry.data).geometry;
+  //var material = this.materialLoader.parse(data.material);
+  //var body = ENGINE.utils.bodyFromJSON(data.body);
+  //var asteroid = new ENGINE.GameObject(geometry, material, body);
+  //
+  //asteroid.castShadow = true;
+  //asteroid.receiveShadow = true;
+  //asteroid.update();
+  //
+  //this.asteroids.push(asteroid);
+  //this.add(asteroid);
 };

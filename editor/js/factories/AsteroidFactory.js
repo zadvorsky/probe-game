@@ -21,7 +21,6 @@ EDITOR.AsteroidFactory = {
     new THREE.SubdivisionModifier(data.subdivisions).modify(geometry);
   
     // 4. calculate center
-  
     var geometryCenter = new THREE.Vector3();
     geometry.computeBoundingBox();
     geometry.boundingBox.center(geometryCenter);
@@ -76,14 +75,5 @@ EDITOR.AsteroidFactory = {
     asteroid.update();
     
     return asteroid;
-  },
-
-  toJSON: function(asteroid) {
-    return {
-      type: 'asteroid',
-      geometry: asteroid.geometry.toJSON(),
-      material: asteroid.material.toJSON(),
-      body: ENGINE.utils.bodyToJSON(asteroid.body)
-    };
   }
 };

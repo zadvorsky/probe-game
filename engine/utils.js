@@ -6,7 +6,7 @@ ENGINE.utils = {
   
   bodyToJSON: function(body) {
     var bodyJSON = {
-      mass: body.mass,
+      mass: body.type === p2.Body.DYNAMIC ? body.mass : 0,
       position: toPlainArray(body.position),
       angle: body.angle,
       shapes: []

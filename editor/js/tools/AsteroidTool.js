@@ -27,7 +27,7 @@ EDITOR.AsteroidTool = Vue.extend({
       this.$root.engine.add(this.asteroid);
     },
     store: function() {
-      this.$root.storeAsteroid(this.asteroid);
+      this.$root.storeGameObject(this.asteroid);
       this.asteroid = null;
       this.reset();
     },

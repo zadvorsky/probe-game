@@ -2,13 +2,22 @@ EDITOR.EditTool = Vue.extend({
   template: `
     <div>
       <div v-if="selectedObject">
-        <div><span class="label">x</span><input type="number" v-model="selectedObject.x"></div>
-        <div><span class="label">y</span><input type="number" v-model="selectedObject.y"></div>
-        <div><span class="label">angle</span><input type="number" v-model="selectedObject.angle"></div>
-        <div><span class="label">color</span><input type="text" v-model="selectedObject.color"></div>
-        <div><span class="label">roughness</span><input type="number" v-model="selectedObject.material.roughness"></div>
-        <div><span class="label">metalness</span><input type="number" v-model="selectedObject.material.metalness"></div>
-        <div><span class="label">mass</span><input type="number" v-model="selectedObject.mass"></div>
+        
+        <template v-if="selectedObject.gameObjectType == 'asteroid'">
+          <div><span class="label">x</span><input type="number" v-model="selectedObject.x"></div>
+          <div><span class="label">y</span><input type="number" v-model="selectedObject.y"></div>
+          <div><span class="label">angle</span><input type="number" v-model="selectedObject.angle"></div>
+          <div><span class="label">color</span><input type="text" v-model="selectedObject.color"></div>
+          <div><span class="label">roughness</span><input type="number" v-model="selectedObject.material.roughness"></div>
+          <div><span class="label">metalness</span><input type="number" v-model="selectedObject.material.metalness"></div>
+          <div><span class="label">mass</span><input type="number" v-model="selectedObject.mass"></div>
+        </template>
+        
+        <template v-if="selectedObject.gameObjectType == 'beacon'">
+          <div><span class="label">x</span><input type="number" v-model="selectedObject.x"></div>
+          <div><span class="label">y</span><input type="number" v-model="selectedObject.y"></div>
+        </template>
+        
         <div><button v-on:click="update">update</button><button v-on:click="delete">delete</button></div>
       </div>
     </div>
@@ -17,10 +26,10 @@ EDITOR.EditTool = Vue.extend({
   ],
   methods: {
     update: function() {
-      this.$root.updateAsteroid(this.selectedObject);
+      this.$root.updateGameObject(this.selectedObject);
     },
     delete: function() {
-      this.$root.deleteAsteroid(this.selectedObject);
+      this.$root.deleteGameObject(this.selectedObject);
       this.selectedObject = null;
     }
   },
@@ -42,7 +51,6 @@ EDITOR.EditTool = Vue.extend({
         if (this.$data.selectedObject === intersects[0].object) return;
 
         this.$data.selectedObject = intersects[0].object;
-
         this.selector.update(this.$data.selectedObject);
         this.selector.geometry.center();
         this.$data.selectedObject.add(this.selector);

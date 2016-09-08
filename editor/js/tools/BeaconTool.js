@@ -1,10 +1,7 @@
 EDITOR.BeaconTool = Vue.extend({
   template: '<div></div>',
 
-  methods: {
-    reset: function () {
-    }
-  },
+  methods: {},
 
   ready: function() {
     var engine = this.$root.engine;
@@ -19,11 +16,9 @@ EDITOR.BeaconTool = Vue.extend({
       if (e.which !== 1) return;
 
       var beacon = new ENGINE.Beacon(this.cursor.position);
-
-      beacon.update();
-
-      this.$root.storeBeacon(beacon);
-
+      
+      this.$root.engine.add(beacon);
+      this.$root.storeGameObject(beacon);
     }.bind(this);
 
     engine.container.addEventListener('click', this.mouseClickHandler);

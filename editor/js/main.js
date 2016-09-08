@@ -69,6 +69,7 @@
         // r
         if (e.keyCode === 82) {
           this.engine.reset();
+          this.engine.parseLevelJSON(this.level);
           this.engine.update(true);
         }
       }.bind(this));
@@ -89,33 +90,17 @@
         return this.intersect(this.engine.gameObjects);
       },
 
-      storeBeacon: function(beacon) {
-        this.engine.add(beacon);
-        //this.engine.gameObjects.push(beacon);
-
-        this.level.objects.push(beacon.toJSON());
+      storeGameObject: function(object) {
+        this.level.objects.push(object.toJSON());
       },
-
-      storeAsteroid: function(asteroid) {
-        //this.engine.gameObjects.push(asteroid);
-        this.level.objects.push(EDITOR.AsteroidFactory.toJSON(asteroid));
+      updateGameObject: function(object) {
+        var index = this.engine.gameObjects.indexOf(object);
+        this.level.objects[index] = object.toJSON();
       },
-
-      updateAsteroid: function(asteroid) {
-        var index = this.engine.gameObjects.indexOf(asteroid);
-        this.level.objects[index] = EDITOR.AsteroidFactory.toJSON(asteroid);
-      },
-      deleteAsteroid: function(asteroid) {
-
-
-        var index = this.engine.gameObjects.indexOf(asteroid);
-
-        console.log('delete', index);
-
-
+      deleteGameObject: function(object) {
+        var index = this.engine.gameObjects.indexOf(object);
         this.level.objects.splice(index, 1);
-        this.engine.remove(asteroid);
-        //this.engine.gameObjects.splice(index, 1);
+        this.engine.remove(object);
       },
 
       createLevel: function(name) {

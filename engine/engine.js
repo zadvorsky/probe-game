@@ -136,7 +136,6 @@ ENGINE.Engine.prototype.remove = function(object, removeFromGameObjects) {
 
   if (removeFromGameObjects !== false) {
     var index = this.gameObjects.indexOf(object);
-    console.log('remove from engine', index);
     if (index !== -1) this.gameObjects.splice(index, 1);
   }
 };
@@ -151,13 +150,9 @@ ENGINE.Engine.prototype.clear = function() {
 ENGINE.Engine.prototype.reset = function() {
   this.probe.reset();
   this.clear();
-
-  this.currentLevelJSON && this.parseLevelJSON(this.currentLevelJSON);
 };
 
 ENGINE.Engine.prototype.parseLevelJSON = function(json) {
-  this.currentLevelJSON = json;
-
   json.objects.forEach(function(obj) {
     switch (obj.type) {
       case 'asteroid':
@@ -168,8 +163,6 @@ ENGINE.Engine.prototype.parseLevelJSON = function(json) {
         break;
     }
   }.bind(this));
-
-
 };
 ENGINE.Engine.prototype.createAsteroid = function(data) {
   var geometry = this.geometryLoader.parse(data.geometry.data).geometry;

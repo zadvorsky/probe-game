@@ -4,7 +4,7 @@ ENGINE.GameObject = function(geometry, material, body, type) {
   this.body = body;
   this.body.userData = {};
   this.scripts = [];
-  this.engineType = type;
+  this.gameObjectType = type;
 
   this.addScript(function() {
     this.position.x = this.body.position[0];
@@ -30,7 +30,7 @@ ENGINE.GameObject.prototype.addScript = function(script, priority) {
   })
 };
 
-Object.defineProperty(ENGINE.GameObject.prototype, 'engineType', {
+Object.defineProperty(ENGINE.GameObject.prototype, 'gameObjectType', {
   get: function() {
     return this.body.userData.type;
   },
@@ -53,6 +53,7 @@ Object.defineProperty(ENGINE.GameObject.prototype, 'color', {
 
 Object.defineProperty(ENGINE.GameObject.prototype, 'mass', {
   get: function() {
+    console.log('game object get mass');
     return (this.body.type === p2.Body.DYNAMIC ? this.body.mass : 0);
   },
   set: function(v) {
@@ -64,6 +65,7 @@ Object.defineProperty(ENGINE.GameObject.prototype, 'mass', {
 
 Object.defineProperty(ENGINE.GameObject.prototype, 'x', {
   get: function() {
+    console.log('game object get x');
     return this.body.position[0];
   },
   set: function(v) {
@@ -74,6 +76,7 @@ Object.defineProperty(ENGINE.GameObject.prototype, 'x', {
 
 Object.defineProperty(ENGINE.GameObject.prototype, 'y', {
   get: function() {
+    console.log('game object get y');
     return this.body.position[1];
   },
   set: function(v) {
@@ -84,6 +87,7 @@ Object.defineProperty(ENGINE.GameObject.prototype, 'y', {
 
 Object.defineProperty(ENGINE.GameObject.prototype, 'angle', {
   get: function() {
+    console.log('game object get angle');
     return this.body.angle;
   },
   set: function(v) {

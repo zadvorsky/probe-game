@@ -11,8 +11,15 @@ ENGINE.Probe = function() {
   });
 
   // physics
-  var shape = new p2.Circle({radius: 1.0});
-  var body = new p2.Body({mass: 1.0});
+  var shape = new p2.Circle({
+    radius: 1.0,
+    collisionGroup: ENGINE.COLLISION_GROUPS.PROBE,
+    collisionMask: ENGINE.COLLISION_GROUPS.ASTEROID | ENGINE.COLLISION_GROUPS.BEACON
+  });
+  var body = new p2.Body({
+    mass: 1.0,
+    damping: 0.0
+  });
   body.addShape(shape);
 
   ENGINE.GameObject.call(this, geometry, material, body, 'probe');

@@ -48,12 +48,12 @@ EDITOR.AsteroidTool = Vue.extend({
 
       material: {
         color: '#666666',
-        roughness: 0.5,
-        metalness: 0.5
+        roughness: 1.0,
+        metalness: 0.0
       },
       extrudeDepth: 0.25,
       subdivisions: 1,
-      mass: 0,
+      mass: 10,
       angle: 0
     };
   },

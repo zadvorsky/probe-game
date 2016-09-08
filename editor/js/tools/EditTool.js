@@ -3,7 +3,7 @@ EDITOR.EditTool = Vue.extend({
     <div>
       <div v-if="selectedObject">
         
-        <template v-if="selectedObject.gameObjectType == 'asteroid'">
+        <template v-if="selectedObject.gType == 'asteroid'">
           <div><span class="label">x</span><input type="number" v-model="selectedObject.x"></div>
           <div><span class="label">y</span><input type="number" v-model="selectedObject.y"></div>
           <div><span class="label">angle</span><input type="number" v-model="selectedObject.angle"></div>
@@ -13,7 +13,7 @@ EDITOR.EditTool = Vue.extend({
           <div><span class="label">mass</span><input type="number" v-model="selectedObject.mass"></div>
         </template>
         
-        <template v-if="selectedObject.gameObjectType == 'beacon'">
+        <template v-if="selectedObject.gType == 'beacon'">
           <div><span class="label">x</span><input type="number" v-model="selectedObject.x"></div>
           <div><span class="label">y</span><input type="number" v-model="selectedObject.y"></div>
         </template>

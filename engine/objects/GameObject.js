@@ -2,13 +2,13 @@ ENGINE.GameObject = function(geometry, material, body, type) {
   THREE.Mesh.call(this, geometry, material);
 
   this.body = body;
-  this.body.userData = {};
+  this.body.gameObject = this;
   this.scripts = [];
-  this.gameObjectType = type;
+  this.gType = type;
 
   this.addScript(function() {
-    this.position.x = this.body.position[0];
-    this.position.y = this.body.position[1];
+    this._x = this.position.x = this.body.position[0];
+    this._y = this.position.y = this.body.position[1];
     this.rotation.z = this.body.angle;
   });
 
@@ -30,15 +30,6 @@ ENGINE.GameObject.prototype.addScript = function(script, priority) {
   })
 };
 
-Object.defineProperty(ENGINE.GameObject.prototype, 'gameObjectType', {
-  get: function() {
-    return this.body.userData.type;
-  },
-  set: function(v) {
-    this.body.userData.type = v;
-  }
-});
-
 // todo move these to a EngineGameObjectAdapter?
 
 Object.defineProperty(ENGINE.GameObject.prototype, 'color', {
@@ -53,7 +44,6 @@ Object.defineProperty(ENGINE.GameObject.prototype, 'color', {
 
 Object.defineProperty(ENGINE.GameObject.prototype, 'mass', {
   get: function() {
-    console.log('game object get mass');
     return (this.body.type === p2.Body.DYNAMIC ? this.body.mass : 0);
   },
   set: function(v) {
@@ -65,29 +55,24 @@ Object.defineProperty(ENGINE.GameObject.prototype, 'mass', {
 
 Object.defineProperty(ENGINE.GameObject.prototype, 'x', {
   get: function() {
-    console.log('game object get x');
-    return this.body.position[0];
+    return this._x;
   },
   set: function(v) {
-    this.body.position[0] = v;
-    this.position.x = v;
+    this._x = this.position.x = this.body.position[0] = v;
   }
 });
 
 Object.defineProperty(ENGINE.GameObject.prototype, 'y', {
   get: function() {
-    console.log('game object get y');
-    return this.body.position[1];
+    return this._y;
   },
   set: function(v) {
-    this.body.position[1] = v;
-    this.position.y = v;
+    this._y = this.position.y = this.body.position[1] = v;
   }
 });
 
 Object.defineProperty(ENGINE.GameObject.prototype, 'angle', {
   get: function() {
-    console.log('game object get angle');
     return this.body.angle;
   },
   set: function(v) {

@@ -4,8 +4,10 @@ ENGINE.Beacon = function(position) {
     position: [position.x, position.y]
   });
   body.addShape(new p2.Circle({
-    radius: ENGINE.Beacon.radius,
-    sensor: true
+    radius: ENGINE.Beacon.radius * 0.5,
+    sensor: true,
+    collisionGroup: ENGINE.COLLISION_GROUPS.BEACON,
+    collisionMask: ENGINE.COLLISION_GROUPS.PROBE
   }));
 
   ENGINE.GameObject.call(this, ENGINE.Beacon.geometry, ENGINE.Beacon.material, body, 'beacon');

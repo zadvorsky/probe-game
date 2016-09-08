@@ -8,6 +8,16 @@
 //=require objects/*.js
 //=require controllers/*.js
 
+// STATIC
+ENGINE.COLLISION_GROUPS = {
+  ASTEROID: Math.pow(2, 0),
+  PROBE: Math.pow(2, 1),
+  BEACON: Math.pow(2, 1)
+};
+ENGINE.COLLISION_MATERIALS = {
+
+};
+
 ENGINE.Engine = function(container) {
   // renderer
   this.container = container;
@@ -21,35 +31,38 @@ ENGINE.Engine = function(container) {
   this.registerCamera('game', new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.1, 10000));
   this.activateCamera('game');
 
-  // resize
-  this.resize = this.resize.bind(this);
-  this.resize();
-  window.addEventListener('resize', this.resize, false);
-
   // physics
   this.world = new p2.World({
     gravity: [0, 0]
   });
-  // todo init global materials, groups
+
+  // todo add CollisionMaterials
+
+  this.world.on("beginContact", this.handleBeginContact.bind(this));
 
   // lights
   this.directionalLight1 = new THREE.DirectionalLight(0xffffff, 0.125);
   this.directionalLight1.position.set(0, 0, 1);
   this.scene.add(this.directionalLight1);
 
-  // objects
-  this.initProbe();
-  this.gameObjects = [];
-
   // loaders
   this.geometryLoader = new THREE.JSONLoader();
   this.materialLoader = new THREE.MaterialLoader();
+
+  // objects
+  this.initProbe();
+  this.gameObjects = [];
 
   // tick/update/render
   this.paused = false;
 
   this.tick = this.tick.bind(this);
   this.tick();
+
+  // resize
+  this.resize = this.resize.bind(this);
+  this.resize();
+  window.addEventListener('resize', this.resize, false);
 };
 
 ENGINE.Engine.prototype.initRenderer = function() {
@@ -67,6 +80,49 @@ ENGINE.Engine.prototype.initRenderer = function() {
 
   this.container.appendChild(this.renderer.domElement);
 };
+ENGINE.Engine.prototype.initProbe = function() {
+  this.probe = new ENGINE.Probe();
+  this.add(this.probe, false);
+
+  this.probe.setCamera(this.cameras['game']);
+
+  this.inputController = new ENGINE.InputController(this.probe);
+};
+
+/**
+ * collisions:
+ * probe <-> beacon
+ * probe <-> asteroid
+ * probe <-> target
+ * asteroid <-> asteroid
+ */
+ENGINE.Engine.prototype.handleBeginContact = function(e) {
+  var bodyA = e.bodyA;
+  var bodyB = e.bodyB;
+
+  console.log('HANDLE BEGIN CONTACT', e);
+
+  if ((bodyA.gameObject.gType === 'asteroid' && bodyB.gameObject.gType === 'asteroid')) {
+    console.log('asteroid asteroid');
+  }
+  else {
+    var probeBody = (bodyA.gameObject.gType === 'probe') ? bodyA : bodyB;
+    var otherBody = (probeBody === bodyA) ? bodyB : bodyA;
+
+    switch (otherBody.gameObject.gType) {
+      case 'asteroid':
+        console.log('probe asteroid');
+        break;
+      case 'beacon':
+        console.log('probe beacon');
+        this.remove(otherBody.gameObject);
+        break;
+      default:
+        console.log('UNHANDLED COLLISION', bodyA.gameObject.gType, bodyB.gameObject.gType);
+        break;
+    }
+  }
+};
 
 ENGINE.Engine.prototype.tick = function() {
   this.update();
@@ -74,11 +130,6 @@ ENGINE.Engine.prototype.tick = function() {
 
   requestAnimationFrame(this.tick);
 };
-
-// todo add states?
-// - paused/idle (editor default?)
-// - play
-
 ENGINE.Engine.prototype.update = function(force) {
   if (this.paused === true && force !== true) return;
 
@@ -90,7 +141,6 @@ ENGINE.Engine.prototype.update = function(force) {
     (child.update && child.update.length == 0) && child.update();
   });
 };
-
 ENGINE.Engine.prototype.render = function() {
   this.renderer.render(this.scene, this.activeCamera);
 };
@@ -106,15 +156,6 @@ ENGINE.Engine.prototype.resize = function() {
   }
 
   this.renderer.setSize(width, height);
-};
-
-ENGINE.Engine.prototype.initProbe = function() {
-  this.probe = new ENGINE.Probe();
-  this.add(this.probe, false);
-
-  this.probe.setCamera(this.cameras['game']);
-
-  this.inputController = new ENGINE.InputController(this.probe);
 };
 
 ENGINE.Engine.prototype.registerCamera = function(key, camera) {
@@ -146,7 +187,6 @@ ENGINE.Engine.prototype.clear = function() {
   }.bind(this));
   this.gameObjects.length = 0;
 };
-
 ENGINE.Engine.prototype.reset = function() {
   this.probe.reset();
   this.clear();
@@ -172,7 +212,6 @@ ENGINE.Engine.prototype.createAsteroid = function(data) {
 
   this.add(asteroid);
 };
-
 ENGINE.Engine.prototype.createBeacon = function(data) {
   var beacon = new ENGINE.Beacon(data.position);
 

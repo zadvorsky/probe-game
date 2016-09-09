@@ -9,7 +9,7 @@
           "type": "Geometry",
           "generator": "Geometry.toJSON"
         },
-        "uuid": "5B843B24-147F-480A-B486-823411D59F1C",
+        "uuid": "427AEECD-97CD-4DAD-9604-CE0C9730E630",
         "type": "Geometry",
         "data": {
           "vertices": [
@@ -15342,8 +15342,8 @@
       "body": {
         "mass": 10,
         "position": [
-          -10.100000381469727,
-          -6.5
+          -8.600000381469727,
+          -6
         ],
         "angle": 0,
         "shapes": [

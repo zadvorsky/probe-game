@@ -19,7 +19,6 @@ EDITOR.AsteroidTool = Vue.extend({
         this.asteroid = null;
       }
     },
-
     generate: function() {
       this.destroyAsteroid();
 
@@ -31,7 +30,6 @@ EDITOR.AsteroidTool = Vue.extend({
       this.asteroid = null;
       this.reset();
     },
-
     reset: function() {
       if (this.asteroid) {
         this.$root.engine.remove(this.asteroid);
@@ -59,17 +57,14 @@ EDITOR.AsteroidTool = Vue.extend({
   },
 
   ready: function() {
-    var engine = this.$root.engine;
-    var plane = this.$root.zPlane;
-
     this.cursor = new EDITOR.Cursor(0.2);
-    engine.add(this.cursor, false);
+    this.$root.zPlane.setCursor(this.cursor);
     
     this.drawingLine = new EDITOR.DrawingLine(this.points);
-    engine.add(this.drawingLine, false);
+    this.$root.engine.add(this.drawingLine, false);
 
-    engine.container.style.cursor = 'crosshair';
-    
+    this.$root.engine.container.style.cursor = 'crosshair';
+
     this.states = {
       draw: 1,
       complete: 2
@@ -98,39 +93,18 @@ EDITOR.AsteroidTool = Vue.extend({
           break;
       }
     }.bind(this);
-    
-    engine.container.addEventListener('mousemove', this.mouseMoveHandler);
-    engine.container.addEventListener('click', this.mouseClickHandler);
 
-    var update = function() {
-      var intersects = this.$root.intersect(plane);
-
-      if (intersects && intersects.length) {
-        var p = intersects[0].point;
-
-        // if snapping
-        plane.snapPoint(p);
-
-        this.cursor.position.copy(p);
-      }
-
-      this.rafid = requestAnimationFrame(update);
-    }.bind(this);
-
-    update();
+    this.$root.engine.container.addEventListener('mousemove', this.mouseMoveHandler);
+    this.$root.engine.container.addEventListener('click', this.mouseClickHandler);
   },
 
   beforeDestroy: function() {
-    this.destroyAsteroid();
-
+    this.$root.zPlane.setCursor(null);
     this.$root.engine.container.style.cursor = '';
-    
-    this.$root.engine.remove(this.drawingLine);
-    this.$root.engine.remove(this.cursor);
-
     this.$root.engine.container.removeEventListener('mousemove', this.mouseMoveHandler);
     this.$root.engine.container.removeEventListener('click', this.mouseClickHandler);
 
-    cancelAnimationFrame(this.rafid);
+    this.destroyAsteroid();
+    this.$root.engine.remove(this.drawingLine);
   }
 });

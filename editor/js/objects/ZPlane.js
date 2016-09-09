@@ -25,3 +25,15 @@ EDITOR.ZPlane.prototype.snapPoint = function(point) {
 
   return point;
 };
+
+EDITOR.ZPlane.prototype.setCursor = function(cursor) {
+  this.cursor && this.remove(this.cursor);
+  this.cursor = cursor;
+  this.cursor && this.add(cursor);
+};
+
+EDITOR.ZPlane.prototype.updateCursor = function(intersects) {
+  if (this.cursor && intersects && intersects.length) {
+    this.cursor.position.copy(this.snapPoint(intersects[0].point));
+  }
+};

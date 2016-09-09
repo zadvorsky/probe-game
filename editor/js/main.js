@@ -49,6 +49,15 @@
         this.mouseNDC.set((e.clientX / window.innerWidth) * 2 - 1, -(e.clientY / window.innerHeight) * 2 + 1);
       }.bind(this));
 
+      var update = function() {
+        if (this.engine.paused) {
+          this.zPlane.updateCursor(this.intersect(this.zPlane));
+        }
+
+        requestAnimationFrame(update);
+      }.bind(this);
+      update();
+
       // key handling
 
       var routeBeforePlay = '';
@@ -85,9 +94,7 @@
       window.addEventListener('keydown', function(e) {
         // s
         if (e.keyCode === 83 && (e.getModifierState('Meta') || e.getModifierState('Control'))) {
-          console.log('save!');
           e.preventDefault();
-
           this.saveLevel();
         }
       }.bind(this));

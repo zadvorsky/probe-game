@@ -4,18 +4,18 @@ EDITOR.EditTool = Vue.extend({
       <div v-if="selectedObject">
         
         <template v-if="selectedObject.gType == 'asteroid'">
-          <div><span class="label">x</span><input type="number" number v-model="selectedObject.x"></div>
-          <div><span class="label">y</span><input type="number" number v-model="selectedObject.y"></div>
-          <div><span class="label">angle</span><input type="number" number v-model="selectedObject.angle"></div>
-          <div><span class="label">color</span><input type="text" number v-model="selectedObject.color"></div>
-          <div><span class="label">roughness</span><input type="number" number v-model="selectedObject.material.roughness"></div>
-          <div><span class="label">metalness</span><input type="number" number v-model="selectedObject.material.metalness"></div>
-          <div><span class="label">mass</span><input type="number" number v-model="selectedObject.mass"></div>
+          <number-input :value.sync="selectedObject.x" label="x"></number-input>
+          <number-input :value.sync="selectedObject.y" label="y"></number-input>
+          <number-input :value.sync="selectedObject.angle" label="angle"></number-input>
+          <text-input :value.sync="selectedObject.color" label="color"></text-input>
+          <number-input :value.sync="selectedObject.material.roughness" label="roughness"></number-input>
+          <number-input :value.sync="selectedObject.material.metalness" label="metalness"></number-input>
+          <number-input :value.sync="selectedObject.mass" label="mass"></number-input>
         </template>
         
         <template v-if="selectedObject.gType == 'beacon'">
-          <div><span class="label">x</span><input type="number" v-model="selectedObject.x"></div>
-          <div><span class="label">y</span><input type="number" v-model="selectedObject.y"></div>
+          <number-input :value.sync="selectedObject.x" label="x"></number-input>
+          <number-input :value.sync="selectedObject.y" label="y"></number-input>
         </template>
         
         <div><button v-on:click="update">update</button><button v-on:click="delete">delete</button></div>

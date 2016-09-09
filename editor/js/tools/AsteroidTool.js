@@ -1,11 +1,12 @@
 EDITOR.AsteroidTool = Vue.extend({
   template: `
     <div>
-      <div><span class="label">extrude</span><input type="number" v-model="extrudeDepth"></div>
-      <div><span class="label">color</span><input type="text" v-model="material.color"></div>
-      <div><span class="label">roughness</span><input type="number" v-model="material.roughness"></div>
-      <div><span class="label">metalness</span><input type="number" v-model="material.metalness"></div>
-      <div><span class="label">mass</span><input type="number" v-model="mass"></div>
+      <number-input :value.sync="extrudeDepth" label="extrude"></number-input>
+      <text-input :value.sync="material.color" label="color"></text-input>
+      <number-input :value.sync="material.roughness" label="roughness"></number-input>
+      <number-input :value.sync="material.metalness" label="metalness"></number-input>
+      <number-input :value.sync="mass" label="mass"></number-input>
+
       <div><button v-on:click="generate">generate</button></div>
       <div><button v-on:click="reset">reset</button></div>
       <div><button v-on:click="store">store</button></div>

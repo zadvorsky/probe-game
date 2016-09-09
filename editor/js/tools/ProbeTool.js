@@ -2,10 +2,11 @@ EDITOR.ProbeTool = Vue.extend({
   template: `
     <div>
       <div v-if="probe">
-        <div><span class="label">thrust</span><input type="number" v-model="probe.thrusterPower" number></div>
-        <div><span class="label">damping</span><input type="number" v-model="probe.angularDamping" number></div>
-        <div><span class="label">cam z</span><input type="number" v-model="probe.cameraDistanceDefault" number></div>
-        <div><span class="label">cam z f</span><input type="number" v-model="probe.cameraDistanceSpeedFactor" number></div>
+        <number-input :value.sync="probe.thrusterPower" label="thrust"></number-input>
+        <number-input :value.sync="probe.angularDamping" label="damping"></number-input>
+        <number-input :value.sync="probe.cameraDistanceDefault" label="cam z"></number-input>
+        <number-input :value.sync="probe.cameraDistanceSpeedFactor" label="cam z f"></number-input>
+
         <div><button v-on:click="save">save</button></div>
       </div>
     </div>

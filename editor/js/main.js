@@ -11,6 +11,7 @@
 //=require init.js
 //=require utils.js
 //=require objects/*.js
+//=require components/*.js
 //=require tools/*.js
 //=require factories/*.js
 

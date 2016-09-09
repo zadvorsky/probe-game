@@ -22,8 +22,6 @@ EDITOR.EditTool = Vue.extend({
       </div>
     </div>
   `,
-  props: [
-  ],
   methods: {
     update: function() {
       this.$root.updateGameObject(this.selectedObject);
@@ -31,12 +29,27 @@ EDITOR.EditTool = Vue.extend({
     delete: function() {
       this.$root.deleteGameObject(this.selectedObject);
       this.selectedObject = null;
+    },
+
+    autoUpdate: function(newVal, oldVal) {
+      if (oldVal !== null && newVal !== oldVal) {
+        this.update();
+      }
     }
   },
   data: function() {
     return {
       selectedObject: null
     };
+  },
+  watch: {
+    'selectedObject && selectedObject.x': function(newVal, oldVal) {this.autoUpdate(newVal, oldVal)},
+    'selectedObject && selectedObject.y': function(newVal, oldVal) {this.autoUpdate(newVal, oldVal)},
+    'selectedObject && selectedObject.angle': function(newVal, oldVal) {this.autoUpdate(newVal, oldVal)},
+    'selectedObject && selectedObject.color': function(newVal, oldVal) {this.autoUpdate(newVal, oldVal)},
+    'selectedObject && selectedObject.material.roughness': function(newVal, oldVal) {this.autoUpdate(newVal, oldVal)},
+    'selectedObject && selectedObject.material.metalness': function(newVal, oldVal) {this.autoUpdate(newVal, oldVal)},
+    'selectedObject && selectedObject.mass': function(newVal, oldVal) {this.autoUpdate(newVal, oldVal)}
   },
 
   ready: function() {
@@ -64,9 +77,8 @@ EDITOR.EditTool = Vue.extend({
     // down = 40
     // left = 37
     this.keyHandler = function(e) {
-      //console.log('>>', e.ctrlKey, e.shiftKey);
       var handled = true;
-      var step = 0.1;
+      var step = e.shiftKey ? 1.0 : 0.1;
 
       if (!this.selectedObject) return;
 

@@ -9,7 +9,7 @@
           "type": "Geometry",
           "generator": "Geometry.toJSON"
         },
-        "uuid": "D3F2CAB3-D79B-4899-A2CA-57011CB5C60B",
+        "uuid": "5B843B24-147F-480A-B486-823411D59F1C",
         "type": "Geometry",
         "data": {
           "vertices": [
@@ -15342,8 +15342,8 @@
       "body": {
         "mass": 10,
         "position": [
-          -9,
-          -6
+          -10.100000381469727,
+          -6.5
         ],
         "angle": 0,
         "shapes": [
@@ -15921,7 +15921,7 @@
     {
       "type": "beacon",
       "position": {
-        "x": -8,
+        "x": -7.500000000000002,
         "y": -5.75,
         "z": 0
       }
@@ -15930,7 +15930,7 @@
       "type": "beacon",
       "position": {
         "x": -17,
-        "y": -6,
+        "y": -7.099999904632568,
         "z": 0
       }
     }

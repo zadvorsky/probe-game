@@ -81,6 +81,16 @@
           this.engine.update(true);
         }
       }.bind(this));
+
+      window.addEventListener('keydown', function(e) {
+        // s
+        if (e.keyCode === 83 && (e.getModifierState('Meta') || e.getModifierState('Control'))) {
+          console.log('save!');
+          e.preventDefault();
+
+          this.saveLevel();
+        }
+      }.bind(this));
     },
 
     methods: {

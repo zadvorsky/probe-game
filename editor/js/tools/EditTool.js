@@ -4,13 +4,13 @@ EDITOR.EditTool = Vue.extend({
       <div v-if="selectedObject">
         
         <template v-if="selectedObject.gType == 'asteroid'">
-          <div><span class="label">x</span><input type="number" v-model="selectedObject.x"></div>
-          <div><span class="label">y</span><input type="number" v-model="selectedObject.y"></div>
-          <div><span class="label">angle</span><input type="number" v-model="selectedObject.angle"></div>
-          <div><span class="label">color</span><input type="text" v-model="selectedObject.color"></div>
-          <div><span class="label">roughness</span><input type="number" v-model="selectedObject.material.roughness"></div>
-          <div><span class="label">metalness</span><input type="number" v-model="selectedObject.material.metalness"></div>
-          <div><span class="label">mass</span><input type="number" v-model="selectedObject.mass"></div>
+          <div><span class="label">x</span><input type="number" number v-model="selectedObject.x"></div>
+          <div><span class="label">y</span><input type="number" number v-model="selectedObject.y"></div>
+          <div><span class="label">angle</span><input type="number" number v-model="selectedObject.angle"></div>
+          <div><span class="label">color</span><input type="text" number v-model="selectedObject.color"></div>
+          <div><span class="label">roughness</span><input type="number" number v-model="selectedObject.material.roughness"></div>
+          <div><span class="label">metalness</span><input type="number" number v-model="selectedObject.material.metalness"></div>
+          <div><span class="label">mass</span><input type="number" number v-model="selectedObject.mass"></div>
         </template>
         
         <template v-if="selectedObject.gType == 'beacon'">
@@ -57,11 +57,40 @@ EDITOR.EditTool = Vue.extend({
       }
     }.bind(this);
 
-    //this.keyHandler = function(e) {
-    //
-    //};
-
     this.$root.engine.container.addEventListener('click', this.mouseClickHandler);
+
+    // up = 38
+    // right = 39
+    // down = 40
+    // left = 37
+    this.keyHandler = function(e) {
+      //console.log('>>', e.ctrlKey, e.shiftKey);
+      var handled = true;
+      var step = 0.1;
+
+      if (!this.selectedObject) return;
+
+      switch (e.keyCode) {
+        case 38:
+          this.selectedObject.y += step;
+          break;
+        case 40:
+          this.selectedObject.y -= step;
+          break;
+        case 39:
+          this.selectedObject.x += step;
+          break;
+        case 37:
+          this.selectedObject.x -= step;
+          break;
+        default:
+          handled = false;
+      }
+
+      handled && e.preventDefault();
+    }.bind(this);
+
+    window.addEventListener('keydown', this.keyHandler);
   },
 
   beforeDestroy: function() {
@@ -72,5 +101,6 @@ EDITOR.EditTool = Vue.extend({
     this.selector = null;
 
     this.$root.engine.container.removeEventListener('click', this.mouseClickHandler);
+    window.removeEventListener('keyup', this.keyHandler);
   }
 });

@@ -50,6 +50,9 @@
       }.bind(this));
 
       // key handling
+
+      var routeBeforePlay = '';
+
       window.addEventListener('keyup', function(e) {
         // p
         if (e.keyCode === 80) {
@@ -59,11 +62,16 @@
             uiContainer.style.display = 'block';
             this.zPlane.visible = true;
             this.engine.activateCamera('editor');
+
+            this.$router.go(routeBeforePlay);
           }
           else {
             uiContainer.style.display = 'none';
             this.zPlane.visible = false;
             this.engine.activateCamera('game');
+
+            routeBeforePlay = this.$router._currentRoute.path;
+            this.$router.go('/');
           }
         }
         // r

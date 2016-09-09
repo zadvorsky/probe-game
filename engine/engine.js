@@ -71,7 +71,7 @@ ENGINE.Engine.prototype.initRenderer = function() {
 
   this.renderer = new THREE.WebGLRenderer({antialias: antialias});
   this.renderer.setPixelRatio(pixelRatio);
-  this.renderer.setClearColor(0x111111);
+  this.renderer.setClearColor(0x000000);
 
   this.renderer.shadowMap.enabled = true;
   this.renderer.shadowMap.type = THREE.BasicShadowMap;

@@ -6,6 +6,7 @@ ENGINE.Probe = function() {
   //var material = new THREE.MeshBasicMaterial({color: 0xffffff, wireframe: true});
   var material = new THREE.MeshStandardMaterial({
     color: 0xffffff,
+    emissive: 0x111111,
     metalness: 0.0,
     shading: THREE.FlatShading
   });

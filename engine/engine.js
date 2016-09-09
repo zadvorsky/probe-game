@@ -41,9 +41,9 @@ ENGINE.Engine = function(container) {
   this.world.on("beginContact", this.handleBeginContact.bind(this));
 
   // lights
-  this.directionalLight1 = new THREE.DirectionalLight(0xffffff, 0.125);
-  this.directionalLight1.position.set(0, 0, 1);
-  this.scene.add(this.directionalLight1);
+  //this.directionalLight1 = new THREE.DirectionalLight(0xffffff, 0.125);
+  //this.directionalLight1.position.set(0, 0, 1);
+  //this.scene.add(this.directionalLight1);
 
   // loaders
   this.geometryLoader = new THREE.JSONLoader();

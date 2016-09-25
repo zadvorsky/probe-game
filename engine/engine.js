@@ -12,7 +12,8 @@
 ENGINE.COLLISION_GROUPS = {
   ASTEROID: Math.pow(2, 0),
   PROBE: Math.pow(2, 1),
-  BEACON: Math.pow(2, 1)
+  BEACON: Math.pow(2, 2),
+  TARGET: Math.pow(2, 3),
 };
 ENGINE.COLLISION_MATERIALS = {
 
@@ -39,6 +40,7 @@ ENGINE.Engine = function(container) {
   // todo add CollisionMaterials
 
   this.world.on("beginContact", this.handleBeginContact.bind(this));
+  this.world.on("endContact", this.handleEndContact.bind(this));
 
   // lights
   //this.directionalLight1 = new THREE.DirectionalLight(0xffffff, 0.125);
@@ -117,8 +119,45 @@ ENGINE.Engine.prototype.handleBeginContact = function(e) {
         console.log('probe beacon');
         this.remove(otherBody.gameObject);
         break;
+      case 'target':
+        console.log('probe target');
+        this.probe.overlappingTarget = otherBody.gameObject;
+        // this.remove(otherBody.gameObject);
+        break;
       default:
-        console.log('UNHANDLED COLLISION', bodyA.gameObject.gType, bodyB.gameObject.gType);
+        console.log('UNHANDLED COLLISION START', bodyA.gameObject.gType, bodyB.gameObject.gType);
+        break;
+    }
+  }
+};
+
+ENGINE.Engine.prototype.handleEndContact = function(e) {
+  var bodyA = e.bodyA;
+  var bodyB = e.bodyB;
+  
+  console.log('HANDLE END CONTACT', e);
+  
+  if ((bodyA.gameObject.gType === 'asteroid' && bodyB.gameObject.gType === 'asteroid')) {
+    console.log('asteroid asteroid');
+  }
+  else {
+    var probeBody = (bodyA.gameObject.gType === 'probe') ? bodyA : bodyB;
+    var otherBody = (probeBody === bodyA) ? bodyB : bodyA;
+    
+    switch (otherBody.gameObject.gType) {
+      case 'asteroid':
+        console.log('probe asteroid');
+        break;
+      case 'beacon':
+        console.log('probe beacon');
+        break;
+      case 'target':
+        console.log('probe target');
+        this.probe.overlappingTarget = null;
+        // this.remove(otherBody.gameObject);
+        break;
+      default:
+        console.log('UNHANDLED COLLISION END', bodyA.gameObject.gType, bodyB.gameObject.gType);
         break;
     }
   }
@@ -201,6 +240,9 @@ ENGINE.Engine.prototype.parseLevelJSON = function(json) {
       case 'beacon':
         this.createBeacon(obj);
         break;
+      case 'target':
+        this.createTarget(obj);
+        break;
     }
   }.bind(this));
 };
@@ -216,4 +258,9 @@ ENGINE.Engine.prototype.createBeacon = function(data) {
   var beacon = new ENGINE.Beacon(data.position);
 
   this.add(beacon);
+};
+ENGINE.Engine.prototype.createTarget = function(data) {
+  var target = new ENGINE.Target(data.position);
+  
+  this.add(target);
 };

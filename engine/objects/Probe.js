@@ -15,7 +15,10 @@ ENGINE.Probe = function() {
   var shape = new p2.Circle({
     radius: 1.0,
     collisionGroup: ENGINE.COLLISION_GROUPS.PROBE,
-    collisionMask: ENGINE.COLLISION_GROUPS.ASTEROID | ENGINE.COLLISION_GROUPS.BEACON
+    collisionMask:
+      ENGINE.COLLISION_GROUPS.ASTEROID |
+      ENGINE.COLLISION_GROUPS.BEACON |
+      ENGINE.COLLISION_GROUPS.TARGET
   });
   var body = new p2.Body({
     mass: 1.0,
@@ -58,6 +61,36 @@ ENGINE.Probe = function() {
   this.addScript(function() {
     this.camera.position.z = this.cameraDistanceDefault + p2.vec2.length(this.body.velocity) * this.cameraDistanceSpeedFactor;
   }, 1);
+  
+  // target
+  this.overlappingTarget = null;
+  
+  this.addScript(function() {
+    if (this.overlappingTarget) {
+      var p = this.body.position;
+      var t = this.overlappingTarget.body.position;
+      var m = ENGINE.Target.size - 2.5;
+      
+      var onTarget = false;
+      var onSpeed = false;
+      
+      if (p[0] > t[0] - m &&
+          p[0] < t[0] + m &&
+          p[1] > t[1] - m &&
+          p[1] < t[1] + m ) {
+        
+        onTarget = true;
+  
+        var vel = p2.vec2.length(this.body.velocity);
+        
+        if (vel < 0.25) {
+          onSpeed = true;
+        }
+        
+        console.log('PROBE OVERLAPPED TARGET', onTarget, onSpeed);
+      }
+    }
+  }, 1);
 };
 ENGINE.utils.extend(ENGINE.Probe, ENGINE.GameObject);
 
@@ -77,6 +110,7 @@ ENGINE.Probe.prototype.reset = function() {
   this.body.velocity[1] = this.body.position[1] = 0;
   this.body.angle = 0;
   this.body.angularVelocity = 0;
+  this.overlappingTarget = null;
 };
 
 Object.defineProperty(ENGINE.Probe.prototype, 'angularDamping', {

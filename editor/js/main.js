@@ -195,6 +195,7 @@
     '/probe': {component: EDITOR.ProbeTool},
     '/asteroid': {component: EDITOR.AsteroidTool},
     '/beacon': {component: EDITOR.BeaconTool},
+    '/target': {component: EDITOR.TargetTool},
     '/edit': {component: EDITOR.EditTool}
   });
 

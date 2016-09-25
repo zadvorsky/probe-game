@@ -18,6 +18,11 @@ EDITOR.EditTool = Vue.extend({
           <number-input :value.sync="selectedObject.y" label="y"></number-input>
         </template>
         
+        <template v-if="selectedObject.gType == 'target'">
+          <number-input :value.sync="selectedObject.x" label="x"></number-input>
+          <number-input :value.sync="selectedObject.y" label="y"></number-input>
+        </template>
+        
         <div><button v-on:click="update">update</button><button v-on:click="delete">delete</button></div>
       </div>
     </div>

@@ -19,6 +19,10 @@ ENGINE.COLLISION_MATERIALS = {
 
 };
 
+/////////////////////////////////////////////////////
+// ENGINE CONSTRUCTOR / INITS
+/////////////////////////////////////////////////////
+
 ENGINE.Engine = function(container) {
   // renderer
   this.container = container;
@@ -54,7 +58,7 @@ ENGINE.Engine = function(container) {
   // objects
   this.initProbe();
   this.gameObjects = [];
-
+  
   // tick/update/render
   this.paused = false;
 
@@ -91,13 +95,10 @@ ENGINE.Engine.prototype.initProbe = function() {
   this.inputController = new ENGINE.InputController(this.probe);
 };
 
-/**
- * collisions:
- * probe <-> beacon
- * probe <-> asteroid
- * probe <-> target
- * asteroid <-> asteroid
- */
+/////////////////////////////////////////////////////
+// COLLISION HANDLING
+/////////////////////////////////////////////////////
+
 ENGINE.Engine.prototype.handleBeginContact = function(e) {
   var bodyA = e.bodyA;
   var bodyB = e.bodyB;
@@ -105,7 +106,7 @@ ENGINE.Engine.prototype.handleBeginContact = function(e) {
   console.log('HANDLE BEGIN CONTACT', e);
 
   if ((bodyA.gameObject.gType === 'asteroid' && bodyB.gameObject.gType === 'asteroid')) {
-    console.log('asteroid asteroid');
+    this.handleAsteroidAsteroidCollision(bodyA.gameObject, bodyB.gameObject, e);
   }
   else {
     var probeBody = (bodyA.gameObject.gType === 'probe') ? bodyA : bodyB;
@@ -113,19 +114,13 @@ ENGINE.Engine.prototype.handleBeginContact = function(e) {
 
     switch (otherBody.gameObject.gType) {
       case 'asteroid':
-        console.log('probe asteroid');
+        this.handleProbeAsteroidCollision(otherBody.gameObject, e);
         break;
       case 'beacon':
-        console.log('probe beacon');
-        this.remove(otherBody.gameObject);
+        this.handleProbeBeaconOverlap(otherBody.gameObject, e);
         break;
       case 'target':
-        console.log('probe target');
-        this.probe.overlappingTarget = otherBody.gameObject;
-        // this.remove(otherBody.gameObject);
-        break;
-      default:
-        console.log('UNHANDLED COLLISION START', bodyA.gameObject.gType, bodyB.gameObject.gType);
+        this.handleProbeTargetOverlapStart(otherBody.gameObject, e);
         break;
     }
   }
@@ -135,33 +130,44 @@ ENGINE.Engine.prototype.handleEndContact = function(e) {
   var bodyA = e.bodyA;
   var bodyB = e.bodyB;
   
-  console.log('HANDLE END CONTACT', e);
-  
-  if ((bodyA.gameObject.gType === 'asteroid' && bodyB.gameObject.gType === 'asteroid')) {
-    console.log('asteroid asteroid');
-  }
-  else {
+  if ((bodyA.gameObject.gType === 'probe' || bodyB.gameObject.gType === 'probe')) {
     var probeBody = (bodyA.gameObject.gType === 'probe') ? bodyA : bodyB;
     var otherBody = (probeBody === bodyA) ? bodyB : bodyA;
     
     switch (otherBody.gameObject.gType) {
-      case 'asteroid':
-        console.log('probe asteroid');
-        break;
-      case 'beacon':
-        console.log('probe beacon');
-        break;
       case 'target':
-        console.log('probe target');
-        this.probe.overlappingTarget = null;
-        // this.remove(otherBody.gameObject);
-        break;
-      default:
-        console.log('UNHANDLED COLLISION END', bodyA.gameObject.gType, bodyB.gameObject.gType);
+        this.handleProbeTargetOverlapEnd(otherBody.gameObject, e);
         break;
     }
   }
 };
+
+ENGINE.Engine.prototype.handleAsteroidAsteroidCollision = function(asteroidA, asteroidB, event) {
+  console.log('asteroid asteroid collision');
+};
+
+ENGINE.Engine.prototype.handleProbeAsteroidCollision = function(asteroid, event) {
+  console.log('probe asteroid collision');
+};
+
+ENGINE.Engine.prototype.handleProbeBeaconOverlap = function(beacon, event) {
+  console.log('probe beacon overlap');
+  this.remove(beacon);
+};
+
+ENGINE.Engine.prototype.handleProbeTargetOverlapStart = function(target, event) {
+  console.log('probe target overlap start');
+  this.probe.overlappingTarget = target;
+};
+
+ENGINE.Engine.prototype.handleProbeTargetOverlapEnd = function(target, event) {
+  console.log('probe target overlap end');
+  this.probe.overlappingTarget = null;
+};
+
+/////////////////////////////////////////////////////
+// LOOP
+/////////////////////////////////////////////////////
 
 ENGINE.Engine.prototype.tick = function() {
   this.update();
@@ -197,12 +203,20 @@ ENGINE.Engine.prototype.resize = function() {
   this.renderer.setSize(width, height);
 };
 
+/////////////////////////////////////////////////////
+// CAMERA
+/////////////////////////////////////////////////////
+
 ENGINE.Engine.prototype.registerCamera = function(key, camera) {
   this.cameras[key] = camera;
 };
 ENGINE.Engine.prototype.activateCamera = function(key) {
   this.activeCamera = this.cameras[key];
 };
+
+/////////////////////////////////////////////////////
+// GAME OBJECT HANDLING
+/////////////////////////////////////////////////////
 
 // todo find better way to handle gameObjects array
 ENGINE.Engine.prototype.add = function(object, addToGameObjects) {
@@ -230,6 +244,10 @@ ENGINE.Engine.prototype.reset = function() {
   this.probe.reset();
   this.clear();
 };
+
+/////////////////////////////////////////////////////
+// LEVEL HANDLING
+/////////////////////////////////////////////////////
 
 ENGINE.Engine.prototype.parseLevelJSON = function(json) {
   json.objects.forEach(function(obj) {
